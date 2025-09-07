@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
@@ -17,6 +18,7 @@ import { useOutlineManagement } from "../hooks/useOutlineManagement";
 import { usePresentationGeneration } from "../hooks/usePresentationGeneration";
 
 const OutlinePage: React.FC = () => {
+  const t = useTranslations('OutlinePage');
   const { presentation_id, outlines } = useSelector(
     (state: RootState) => state.presentationGeneration
   );
@@ -50,8 +52,8 @@ const OutlinePage: React.FC = () => {
         <div className="flex-grow overflow-y-hidden w-[1200px] mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
             <TabsList className="grid w-[50%] mx-auto my-4 grid-cols-2">
-              <TabsTrigger value={TABS.OUTLINE}>Outline & Content</TabsTrigger>
-              <TabsTrigger value={TABS.LAYOUTS}>Select Template</TabsTrigger>
+              <TabsTrigger value={TABS.OUTLINE}>{t('tabs.outline')}</TabsTrigger>
+              <TabsTrigger value={TABS.LAYOUTS}>{t('tabs.layouts')}</TabsTrigger>
             </TabsList>
 
             <div className="flex-grow w-full overflow-y-auto custom_scrollbar">

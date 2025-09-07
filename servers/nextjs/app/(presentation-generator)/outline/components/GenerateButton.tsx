@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ const GenerateButton: React.FC<GenerateButtonProps> = ({
     selectedLayoutGroup,
     onSubmit
 }) => {
+    const t = useTranslations('GenerateButton');
     const pathname = usePathname();
 
     const isDisabled =
@@ -26,9 +28,9 @@ const GenerateButton: React.FC<GenerateButtonProps> = ({
 
     const getButtonText = () => {
         if (loadingState.isLoading) return loadingState.message;
-        if (streamState.isLoading || streamState.isStreaming) return "Loading...";
-        if (!selectedLayoutGroup) return "Select a Template";
-        return "Generate Presentation";
+        if (streamState.isLoading || streamState.isStreaming) return t('generating');
+        if (!selectedLayoutGroup) return t('selectLayout');
+        return t('generate');
     };
 
     return (

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -20,33 +21,34 @@ export const usePresentationGeneration = (
   selectedLayoutGroup: LayoutGroup | null,
   setActiveTab: (tab: string) => void
 ) => {
+  const t = useTranslations('PresentationGeneration');
   const dispatch = useDispatch();
   const router = useRouter();
   const [loadingState, setLoadingState] = useState<LoadingState>(DEFAULT_LOADING_STATE);
 
   const validateInputs = useCallback(() => {
     if (!outlines || outlines.length === 0) {
-      toast.error("No Outlines", {
-        description: "Please wait for outlines to load before generating presentation",
+      toast.error(t('noOutlinesError'), {
+        description: t('noOutlinesDescription'),
       });
       return false;
     }
 
     if (!selectedLayoutGroup) {
-      toast.error("Select Layout Group", {
-        description: "Please select a layout group before generating presentation",
+      toast.error(t('selectLayoutError'), {
+        description: t('selectLayoutDescription'),
       });
       return false;
     }
     if (!selectedLayoutGroup.slides.length) {
-      toast.error("No Slide Schema found", {
-        description: "Please select a Group before generating presentation",
+      toast.error(t('noSlideSchemaError'), {
+        description: t('noSlideSchemaDescription'),
       });
       return false;
     }
 
     return true;
-  }, [outlines, selectedLayoutGroup]);
+  }, [outlines, selectedLayoutGroup, t]);
 
   const prepareLayoutData = useCallback(() => {
     if (!selectedLayoutGroup) return null;
@@ -67,7 +69,7 @@ export const usePresentationGeneration = (
 
 
     setLoadingState({
-      message: "Generating presentation data...",
+      message: t('loadingMessage'),
       isLoading: true,
       showProgress: true,
       duration: 30,
@@ -90,13 +92,13 @@ export const usePresentationGeneration = (
       }
     } catch (error: any) {
       console.error('Error In Presentation Generation(prepare).', error);
-      toast.error("Generation Error", {
-        description: error.message || "Error In Presentation Generation(prepare).",
+      toast.error(t('generationError'), {
+        description: error.message || t('generationErrorDescription'),
       });
     } finally {
       setLoadingState(DEFAULT_LOADING_STATE);
     }
-  }, [validateInputs, prepareLayoutData, presentationId, outlines, dispatch, router]);
+  }, [validateInputs, prepareLayoutData, presentationId, outlines, dispatch, router, t]);
 
   return { loadingState, handleSubmit };
 }; 

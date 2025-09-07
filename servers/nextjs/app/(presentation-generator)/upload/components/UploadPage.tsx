@@ -11,6 +11,7 @@
 
 "use client";
 import React, { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { clearOutlines, setPresentationId } from "@/store/slices/presentationGeneration";
@@ -37,6 +38,7 @@ interface LoadingState {
 }
 
 const UploadPage = () => {
+  const t = useTranslations('UploadPage');
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
@@ -72,12 +74,12 @@ const UploadPage = () => {
    */
   const validateConfiguration = (): boolean => {
     if (!config.language || !config.slides) {
-      toast.error("Please select number of Slides & Language");
+      toast.error(t('errors.selectSlidesAndLanguage'));
       return false;
     }
 
     if (!config.prompt.trim() && files.length === 0) {
-      toast.error("No Prompt or Document Provided");
+      toast.error(t('errors.noPromptOrDocument'));
       return false;
     }
     return true;
@@ -108,10 +110,10 @@ const UploadPage = () => {
   const handleDocumentProcessing = async () => {
     setLoadingState({
       isLoading: true,
-      message: "Processing documents...",
+      message: t('loading.processingDocuments'),
       showProgress: true,
       duration: 90,
-      extra_info: files.length > 0 ? "It might take a few minutes for large documents." : "",
+      extra_info: files.length > 0 ? t('loading.largeDocumentsWarning') : "",
     });
 
     let documents = [];
@@ -144,7 +146,7 @@ const UploadPage = () => {
   const handleDirectPresentationGeneration = async () => {
     setLoadingState({
       isLoading: true,
-      message: "Generating outlines...",
+      message: t('loading.generatingOutlines'),
       showProgress: true,
       duration: 30,
     });
@@ -175,8 +177,8 @@ const UploadPage = () => {
       duration: 0,
       showProgress: false,
     });
-    toast.error("Error", {
-      description: error.message || "Error in upload page.",
+    toast.error(t('errors.genericError'), {
+      description: error.message || t('errors.genericErrorDescription'),
     });
   };
 
@@ -214,7 +216,7 @@ const UploadPage = () => {
         className="w-full rounded-[32px] flex items-center justify-center py-6 bg-[#5141e5] text-white font-instrument_sans font-semibold text-xl hover:bg-[#5141e5]/80 transition-colors duration-300"
         data-testid="next-button"
       >
-        <span>Next</span>
+        <span>{t('nextButton')}</span>
         <ChevronRight className="!w-6 !h-6" />
       </Button>
     </Wrapper>

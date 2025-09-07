@@ -4,99 +4,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useTranslations } from "next-intl";
 import { HelpCircle, X, Search } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 
-const helpQuestions = [
-  {
-    id: 1,
-    category: "Images",
-    question: "How do I change an image?",
-    answer:
-      "Click on any image to reveal the image toolbar. You'll see options to Edit, Adjust position, and change how the image fits within its container. The Edit option allows you to replace or modify the current image.",
-  },
-  {
-    id: 2,
-    category: "Images",
-    question: "Can I generate new images with AI?",
-    answer:
-      "Yes! Click on any image and select the Edit option from the toolbar. In the side panel that appears, you'll find the AI Generate tab. Enter your prompt describing the image you want, and our AI will generate an image based on your description.",
-  },
-  {
-    id: 3,
-    category: "Images",
-    question: "How do I upload my own images?",
-    answer:
-      "Click on any image, then select Edit from the toolbar. In the side panel, click on the Upload tab at the top. You can browse your files to select one. Once uploaded, you can apply it to your design.",
-  },
-  {
-    id: 11,
-    category: "AI Prompts",
-    question: "Can I change slide layout through prompt?",
-    answer:
-      "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe your layout requirements and the AI will change the slide layout accordingly.",
-  },
-  {
-    id: 12,
-    category: "AI Prompts",
-    question: "Can I change slide image through prompt?",
-    answer:
-      "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe the image you want and the AI will update the slide image based on your requirements.",
-  },
-
-  {
-    id: 14,
-    category: "AI Prompts",
-    question: "Can I change content through prompt?",
-    answer:
-      "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe what content you want and the AI will update the slide's text and content based on your description.",
-  },
-  {
-    id: 4,
-    category: "Text",
-    question: "How can I format and highlight text?",
-    answer:
-      "Select any text to see the formatting toolbar appear. You'll have options for Bold, Italic, Underline, Strikethrough,and more.",
-  },
-  {
-    id: 5,
-    category: "Icons",
-    question: "How do I change icons?",
-    answer:
-      "Click on any existing icon to modify it. In the icon selector panel, you can browse icos or use the search function to find specific icons. We offer thousands of icons in various styles.",
-  },
-  {
-    id: 16,
-    category: "Layout",
-    question: "Can I change the position of slide?",
-    answer:
-      "Of course, On side panel you can drag the slide and place wherever you want.",
-  },
-  {
-    id: 15,
-    category: "Layout",
-    question: "Can I add new slide between the slide?",
-    answer:
-      "Yes you can just click on the plus icon below each slide.It will display the all the layouts and choose required one.",
-  },
-  {
-    id: 6,
-    category: "Layout",
-    question: "Can I add more sections to my slides?",
-    answer:
-      "Absolutely! Hover near the bottom of any text box or content block, and you'll see a + icon appear. Click this button to add a new section below the current one. You can also use the Insert menu to add specific section types.",
-  },
-
-  {
-    id: 8,
-    category: "Export",
-    question: "How do I download or export my presentation?",
-    answer:
-      "Click the Export button in the top right menu. You can choose to download as PDF, PowerPoint.",
-  },
-];
-
 const Help = () => {
+  const t = useTranslations('HelpCenter');
+  const helpQuestions = t.raw('questions');
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredQuestions, setFilteredQuestions] = useState(helpQuestions);
@@ -107,18 +22,18 @@ const Help = () => {
   // Extract unique categories and create "All" category list
   useEffect(() => {
     const uniqueCategories = Array.from(
-      new Set(helpQuestions.map((q) => q.category))
+      new Set(helpQuestions.map((q: any) => q.category))
     );
-    setCategories(["All", ...uniqueCategories]);
-  }, []);
+    setCategories([t('allCategory'), ...uniqueCategories]);
+  }, [helpQuestions, t]);
 
   // Filter questions based on search query and selected category
   useEffect(() => {
     let results = helpQuestions;
 
     // Filter by category if not "All"
-    if (selectedCategory !== "All") {
-      results = results.filter((q) => q.category === selectedCategory);
+    if (selectedCategory !== t('allCategory')) {
+      results = results.filter((q: any) => q.category === selectedCategory);
     }
 
     // Filter by search query
@@ -170,7 +85,7 @@ const Help = () => {
       <button
         onClick={handleOpenClose}
         className="help-button hidden fixed bottom-6 right-6 h-12 w-12 z-50 bg-emerald-600 hover:bg-emerald-700 rounded-full md:flex justify-center items-center cursor-pointer shadow-lg transition-all duration-300 hover:shadow-xl"
-        aria-label="Help Center"
+        aria-label={t('ariaLabel')}
       >
         {isOpen ? (
           <X className="text-white h-5 w-5" />
@@ -187,7 +102,7 @@ const Help = () => {
         <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="bg-emerald-600 text-white px-6 py-4 flex justify-between items-center">
-            <h2 className="text-lg font-medium">Help Center</h2>
+            <h2 className="text-lg font-medium">{t('title')}</h2>
             <button
               onClick={() => setIsOpen(false)}
               className="hover:bg-emerald-700 p-1 rounded"
@@ -201,7 +116,7 @@ const Help = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search help topics..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
@@ -230,7 +145,7 @@ const Help = () => {
           <div className="max-h-96 overflow-y-auto px-6 pb-6">
             {filteredQuestions.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
-                {filteredQuestions.map((faq, index) => (
+                {filteredQuestions.map((faq: any, index: number) => (
                   <AccordionItem
                     key={index}
                     value={`item-${index}`}
@@ -256,15 +171,15 @@ const Help = () => {
               </Accordion>
             ) : (
               <div className="py-8 text-center text-gray-500">
-                <p>No results found for "{searchQuery}"</p>
+                <p>{t('noResults', {query: searchQuery})}</p>
                 <button
                   onClick={() => {
                     setSearchQuery("");
-                    setSelectedCategory("All");
+                    setSelectedCategory(t('allCategory'));
                   }}
                   className="mt-2 text-emerald-600 hover:underline text-sm"
                 >
-                  Clear search
+                  {t('clearSearch')}
                 </button>
               </div>
             )}
@@ -272,10 +187,9 @@ const Help = () => {
 
           {/* Footer */}
           <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-            Still need help?{" "}
-            <a href="/contact" className="text-emerald-600 hover:underline">
-              Contact Support
-            </a>
+            {t.rich('footer', {
+              link: (chunks) => <a href="/contact" className="text-emerald-600 hover:underline">{chunks}</a>
+            })}
           </div>
         </div>
       </div>

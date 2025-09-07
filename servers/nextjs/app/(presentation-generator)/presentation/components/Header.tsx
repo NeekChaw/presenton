@@ -37,6 +37,7 @@ import { usePresentationUndoRedo } from "../hooks/PresentationUndoRedo";
 import ToolTip from "@/components/ToolTip";
 import { clearPresentationData } from "@/store/slices/presentationGeneration";
 import { clearHistory } from "@/store/slices/undoRedoSlice";
+import { useTranslations } from "next-intl";
 
 const Header = ({
   presentation_id,
@@ -45,6 +46,7 @@ const Header = ({
   presentation_id: string;
   currentSlide?: number;
 }) => {
+  const t = useTranslations('PresentationHeader');
   const [open, setOpen] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const router = useRouter();
@@ -91,9 +93,8 @@ const Header = ({
     } catch (error) {
       console.error("Export failed:", error);
       setShowLoader(false);
-      toast.error("Having trouble exporting!", {
-        description:
-          "We are having trouble exporting your presentation. Please try again.",
+      toast.error(t('toasts.exportErrorTitle'), {
+        description: t('toasts.exportErrorDescription'),
       });
     } finally {
       setShowLoader(false);
@@ -129,9 +130,8 @@ const Header = ({
 
     } catch (err) {
       console.error(err);
-      toast.error("Having trouble exporting!", {
-        description:
-          "We are having trouble exporting your presentation. Please try again.",
+      toast.error(t('toasts.exportErrorTitle'), {
+        description: t('toasts.exportErrorDescription'),
       });
     } finally {
       setShowLoader(false);
@@ -165,8 +165,8 @@ const Header = ({
         }}
         variant="ghost"
         className={`pb-4 border-b rounded-none border-gray-300 w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6 border-none rounded-lg" : ""}`} >
-        <Image src={PDFIMAGE} alt="pdf export" width={30} height={30} />
-        Export as PDF
+        <Image src={PDFIMAGE} alt={t('altTexts.pdfIcon')} width={30} height={30} />
+        {t('exportAsPdf')}
       </Button>
       <Button
         onClick={() => {
@@ -176,8 +176,8 @@ const Header = ({
         variant="ghost"
         className={`w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6" : ""}`}
       >
-        <Image src={PPTXIMAGE} alt="pptx export" width={30} height={30} />
-        Export as PPTX
+        <Image src={PPTXIMAGE} alt={t('altTexts.pptxIcon')} width={30} height={30} />
+        {t('exportAsPptx')}
       </Button>
 
 
@@ -189,10 +189,10 @@ const Header = ({
       {/* undo redo */}
       <button onClick={handleReGenerate} disabled={isStreaming || !presentationData} className="text-white  disabled:opacity-50" >
       
-        Re-Generate
+        {t('regenerate')}
       </button>
       <div className="flex items-center gap-2 ">
-        <ToolTip content="Undo">
+        <ToolTip content={t('undo')}>
         <button disabled={!canUndo} className="text-white disabled:opacity-50" onClick={() => {
           onUndo();
         }}>
@@ -201,7 +201,7 @@ const Header = ({
           
         </button>
           </ToolTip>
-          <ToolTip content="Redo">
+          <ToolTip content={t('redo')}>
 
         <button disabled={!canRedo} className="text-white disabled:opacity-50" onClick={() => {
           onRedo();
@@ -224,7 +224,7 @@ const Header = ({
         className="border border-white font-bold text-white rounded-[32px] transition-all duration-300 group"
       >
         <Play className="w-4 h-4 mr-1 stroke-white group-hover:stroke-black" />
-        Present
+        {t('present')}
       </Button>
 
       {/* Desktop Export Button with Popover */}
@@ -236,7 +236,7 @@ const Header = ({
           <PopoverTrigger asChild>
             <Button className={`border py-5 text-[#5146E5] font-bold rounded-[32px] transition-all duration-500 hover:border hover:bg-[#5146E5] hover:text-white w-full ${mobile ? "" : "bg-white"}`}>
               <SquareArrowOutUpRight className="w-4 h-4 mr-1" />
-              Export
+              {t('export')}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-[250px] space-y-2 py-3 px-2 ">
@@ -256,7 +256,7 @@ const Header = ({
     <>
       <OverlayLoader
         show={showLoader}
-        text="Exporting presentation..."
+        text={t('exporting')}
         showProgress={true}
         duration={40}
       />
@@ -270,7 +270,7 @@ const Header = ({
             <img
               className="h-16"
               src="/logo-white.png"
-              alt="Presentation logo"
+              alt={t('altTexts.logo')}
             />
           </Link>
 

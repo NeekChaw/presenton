@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { LayoutList, ListTree, PanelRightOpen, X } from "lucide-react";
 import ToolTip from "@/components/ToolTip";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ const SidePanel = ({
   setIsMobilePanelOpen,
   loading,
 }: SidePanelProps) => {
+  const t = useTranslations('SidePanel');
   const [isOpen, setIsOpen] = useState(true);
   const [active, setActive] = useState<"list" | "grid">("grid");
 
@@ -124,7 +126,7 @@ const SidePanel = ({
       {/* Desktop Toggle Button - Always visible when panel is closed */}
       {!isOpen && (
         <div className="hidden xl:block fixed left-4 top-1/2 -translate-y-1/2 z-50">
-          <ToolTip content="Open Panel">
+          <ToolTip content={t('openPanel')}>
             <Button
               onClick={() => setIsOpen(true)}
               className="bg-white hover:bg-gray-50 shadow-lg"
@@ -138,7 +140,7 @@ const SidePanel = ({
       {/* Mobile Toggle Button */}
       {!isMobilePanelOpen && (
         <div className="xl:hidden fixed left-4 bottom-4 z-50">
-          <ToolTip content="Show Panel">
+          <ToolTip content={t('showPanel')}>
             <Button
               onClick={() => setIsMobilePanelOpen(true)}
               className="bg-[#5146E5] text-white p-3 rounded-full shadow-lg"
@@ -169,7 +171,7 @@ const SidePanel = ({
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center justify-start gap-4">
-                <ToolTip content="Image Preview">
+                <ToolTip content={t('imagePreview')}>
                   <Button
                     className={`${active === "grid"
                       ? "bg-[#5141e5] hover:bg-[#4638c7]"
@@ -188,7 +190,7 @@ const SidePanel = ({
                     />
                   </Button>
                 </ToolTip>
-                <ToolTip content="List Preview">
+                <ToolTip content={t('listPreview')}>
                   <Button
                     className={`${active === "list"
                       ? "bg-[#5141e5] hover:bg-[#4638c7]"
@@ -232,7 +234,7 @@ const SidePanel = ({
                       className={`p-3 cursor-pointer rounded-lg slide-box`}
                     >
                       <span className="font-medium slide-title">
-                        Slide {index + 1}
+                        {t('slide')} {index + 1}
                       </span>
                       <p className="text-sm slide-description">
                         {slide.content.title}

@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useLayout } from "../../context/LayoutContext";
 import GroupLayouts from "./GroupLayouts";
 
@@ -13,6 +14,7 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
     selectedLayoutGroup,
     onSelectLayoutGroup
 }) => {
+    const t = useTranslations('LayoutSelection');
     const {
         getLayoutsByGroup,
         getGroupSetting,
@@ -140,10 +142,10 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
             <div className="space-y-6">
                 <div className="text-center py-8">
                     <h5 className="text-lg font-medium mb-2 text-gray-700">
-                        No Templates Available
+                        {t('noTemplatesTitle')}
                     </h5>
                     <p className="text-gray-600 text-sm">
-                        No presentation templates could be loaded. Please try refreshing the page.
+                        {t('noTemplatesDescription')}
                     </p>
                 </div>
             </div>
@@ -162,7 +164,7 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
         <div className="space-y-8 mb-4">
             {/* In Built Templates */}
             <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">In Built Templates</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('inBuiltTemplatesTitle')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {inBuiltGroups.map((group) => (
                         <GroupLayouts
@@ -178,11 +180,11 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
             {/* Custom AI Templates */}
             <div>
                 <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">Custom AI Templates</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('customAITemplatesTitle')}</h3>
                 </div>
                 {customGroups.length === 0 ? (
                     <div className="text-sm text-gray-600 py-2">
-                        No custom templates. Create one from "Create Template" menu.
+                        {t('noCustomTemplates')}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

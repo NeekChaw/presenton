@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 
 const LoadingState = () => {
+    const t = useTranslations('LoadingState');
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
-    const tips = [
-        "We're crafting your presentation with AI magic ✨",
-        "Analyzing your content for perfect slides 📊",
-        "Organizing information for maximum impact 🎯",
-        "Adding visual elements to engage your audience 🎨",
-        "Almost there! Putting final touches ⚡️"
-    ];
+    const tips = t.raw('tips');
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -25,7 +21,7 @@ const LoadingState = () => {
                 <div className="bg-white rounded-xl p-6 w-full">
                     <div className="flex items-center justify-center space-x-4 ">
 
-                        <h2 className="text-2xl font-semibold text-gray-800">Creating Your Presentation</h2>
+                        <h2 className="text-2xl font-semibold text-gray-800">{t('title')}</h2>
                     </div>
                     <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-6 mb-4">
                         <div className="min-h-[120px] flex items-center justify-center">

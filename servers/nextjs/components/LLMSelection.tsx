@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { Check, ChevronsUpDown, Info } from "lucide-react";
 import { Button } from "./ui/button";
@@ -47,6 +48,7 @@ export default function LLMProviderSelection({
   onConfigChange,
   setButtonState,
 }: LLMProviderSelectionProps) {
+  const t = useTranslations('LLMSelection');
   const [llmConfig, setLlmConfig] = useState<LLMConfig>(initialLLMConfig);
   const [openImageProviderSelect, setOpenImageProviderSelect] = useState(false);
 
@@ -74,7 +76,7 @@ export default function LLMProviderSelection({
     setButtonState({
       isLoading: false,
       isDisabled: needsModelSelection || needsApiKey || needsOllamaUrl,
-      text: needsModelSelection ? "Please Select a Model" : needsApiKey ? "Please Enter API Key" : needsOllamaUrl ? "Please Enter Ollama URL" : "Save Configuration",
+      text: needsModelSelection ? t('button.selectModel') : needsApiKey ? t('button.enterApiKey') : needsOllamaUrl ? t('button.enterOllamaUrl') : t('button.saveConfiguration'),
       showProgress: false
     });
 
@@ -127,11 +129,11 @@ export default function LLMProviderSelection({
           className="w-full"
         >
           <TabsList className="grid w-full grid-cols-5 bg-transparent h-10">
-            <TabsTrigger value="openai">OpenAI</TabsTrigger>
-            <TabsTrigger value="google">Google</TabsTrigger>
-            <TabsTrigger value="anthropic">Anthropic</TabsTrigger>
-            <TabsTrigger value="ollama">Ollama</TabsTrigger>
-            <TabsTrigger value="custom">Custom</TabsTrigger>
+            <TabsTrigger value="openai">{t('tabs.openai')}</TabsTrigger>
+            <TabsTrigger value="google">{t('tabs.google')}</TabsTrigger>
+            <TabsTrigger value="anthropic">{t('tabs.anthropic')}</TabsTrigger>
+            <TabsTrigger value="ollama">{t('tabs.ollama')}</TabsTrigger>
+            <TabsTrigger value="custom">{t('tabs.custom')}</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -201,7 +203,7 @@ export default function LLMProviderSelection({
         {/* Image Provider Selection */}
         <div className="my-8">
           <label className="block text-sm font-medium text-gray-700 mb-3">
-            Select Image Provider
+            {t('imageProviderLabel')}
           </label>
           <div className="w-full">
             <Popover
@@ -220,7 +222,7 @@ export default function LLMProviderSelection({
                       {llmConfig.IMAGE_PROVIDER
                         ? IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER]?.label ||
                         llmConfig.IMAGE_PROVIDER
-                        : "Select image provider"}
+                        : t('selectImageProvider')}
                     </span>
                   </div>
                   <ChevronsUpDown className="w-4 h-4 text-gray-500" />
@@ -232,9 +234,9 @@ export default function LLMProviderSelection({
                 style={{ width: "var(--radix-popover-trigger-width)" }}
               >
                 <Command>
-                  <CommandInput placeholder="Search provider..." />
+                  <CommandInput placeholder={t('searchProviderPlaceholder')} />
                   <CommandList>
-                    <CommandEmpty>No provider found.</CommandEmpty>
+                    <CommandEmpty>{t('noProviderFound')}</CommandEmpty>
                     <CommandGroup>
                       {Object.values(IMAGE_PROVIDERS).map(
                         (provider, index) => (
@@ -321,7 +323,7 @@ export default function LLMProviderSelection({
                 </div>
                 <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
                   <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-                  API key for {provider.label} image generation
+                  {t('apiKeyInfo', {provider: provider.label})}
                 </p>
               </div>
             );
@@ -333,27 +335,26 @@ export default function LLMProviderSelection({
             <Info className="w-5 h-5 text-blue-500 mt-0.5" />
             <div>
               <h3 className="text-sm font-medium text-blue-900 mb-1">
-                Selected Models
+                {t('selectedModelsTitle')}
               </h3>
               <p className="text-sm text-blue-700">
-                Using{" "}
-                {llmConfig.LLM === "ollama"
-                  ? llmConfig.OLLAMA_MODEL ?? "xxxxx"
-                  : llmConfig.LLM === "custom"
-                    ? llmConfig.CUSTOM_MODEL ?? "xxxxx"
-                    : llmConfig.LLM === "anthropic"
-                      ? llmConfig.ANTHROPIC_MODEL ?? "xxxxx"
-                      : llmConfig.LLM === "google"
-                        ? llmConfig.GOOGLE_MODEL ?? "xxxxx"
-                        : llmConfig.LLM === "openai"
-                          ? llmConfig.OPENAI_MODEL ?? "xxxxx"
-                          : "xxxxx"}{" "}
-                for text generation and{" "}
-                {llmConfig.IMAGE_PROVIDER &&
-                  IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER]
-                  ? IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER].label
-                  : "xxxxx"}{" "}
-                for images
+                {t('selectedModelsInfo', {
+                  textModel: llmConfig.LLM === "ollama"
+                    ? llmConfig.OLLAMA_MODEL ?? "xxxxx"
+                    : llmConfig.LLM === "custom"
+                      ? llmConfig.CUSTOM_MODEL ?? "xxxxx"
+                      : llmConfig.LLM === "anthropic"
+                        ? llmConfig.ANTHROPIC_MODEL ?? "xxxxx"
+                        : llmConfig.LLM === "google"
+                          ? llmConfig.GOOGLE_MODEL ?? "xxxxx"
+                          : llmConfig.LLM === "openai"
+                            ? llmConfig.OPENAI_MODEL ?? "xxxxx"
+                            : "xxxxx",
+                  imageModel: llmConfig.IMAGE_PROVIDER &&
+                    IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER]
+                    ? IMAGE_PROVIDERS[llmConfig.IMAGE_PROVIDER].label
+                    : "xxxxx"
+                })}
               </p>
             </div>
           </div>

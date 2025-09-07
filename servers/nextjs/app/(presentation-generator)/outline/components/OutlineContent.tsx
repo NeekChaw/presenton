@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useTranslations } from "next-intl";
 import {
     DndContext,
     closestCenter,
@@ -38,6 +39,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
     onDragEnd,
     onAddSlide
 }) => {
+    const t = useTranslations('OutlineContent');
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -53,7 +55,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                 <div className="flex items-center justify-center">
                     <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 text-xs">
                         <Loader2 className="h-3 w-3 animate-spin" />
-                        Thinking
+                        {t('thinking')}
                     </span>
                 </div>
             )}
@@ -137,7 +139,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                         disabled={isLoading || isStreaming}
                         className="w-full my-4 text-blue-600 border-blue-200"
                     >
-                        + Add Slide
+                        {t('addSlide')}
                     </Button>
                 </div>
             )}
@@ -146,7 +148,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
             {!isStreaming && !isLoading && outlines && outlines.length === 0 && (
                 <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-200">
                     <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">No outlines available</p>
+                    <p className="text-gray-600 mb-4">{t('noOutlines')}</p>
                     <Button
                         variant="outline"
                         onClick={() => {
@@ -155,7 +157,7 @@ const OutlineContent: React.FC<OutlineContentProps> = ({
                         }}
                         className="text-blue-600 border-blue-200"
                     >
-                        + Add First Slide
+                        {t('addFirstSlide')}
                     </Button>
                 </div>
             )}

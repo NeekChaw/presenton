@@ -1,0 +1,329 @@
+{
+  "Home": {
+    "logoAlt": "Presenton 标志",
+    "tagline": "开源 AI 演示文稿生成器",
+    "pageTitle": "Presenton | AI 驱动的演示文稿生成器",
+    "title": "使用 AI 创建演示文稿的最简单方法",
+    "description": "只需提供一个主题、一份文档或一段描述，我们的人工智能就能在几分钟内为您生成专业的演示文稿。",
+    "ctaButton": "开始使用",
+    "githubLink": "在 GitHub 上查看"
+  },
+  "Header": {
+    "createTemplate": "创建模板",
+    "templates": "模板列表"
+  },
+  "LLMSelection": {
+    "tabs": {
+      "openai": "OpenAI",
+      "google": "谷歌",
+      "anthropic": "Anthropic",
+      "ollama": "Ollama",
+      "custom": "自定义"
+    },
+    "imageProviderLabel": "选择图片提供商",
+    "searchProviderPlaceholder": "搜索提供商...",
+    "noProviderFound": "未找到提供商。",
+    "selectImageProvider": "选择图片提供商",
+    "apiKeyInfo": "用于 {provider} 图片生成的 API 密钥",
+    "selectedModelsTitle": "已选模型",
+    "selectedModelsInfo": "使用 {textModel} 生成文本，使用 {imageModel} 生成图片",
+    "button": {
+      "saveConfiguration": "保存配置",
+      "savingConfiguration": "正在保存配置...",
+      "selectModel": "请选择一个模型",
+      "enterApiKey": "请输入 API 密钥",
+      "enterOllamaUrl": "请输入 Ollama URL"
+    }
+  },
+  "OpenAIConfig": {
+    "apiKeyLabel": "OpenAI API 密钥",
+    "apiKeyPlaceholder": "输入您的 API 密钥",
+    "apiKeyDescription": "您的 API 密钥将存储在本地，绝不会被共享",
+    "checkModelsButton": "检查可用模型",
+    "checkingModelsButton": "正在检查模型...",
+    "noModelsFound": "未找到模型。请确保您的 API 密钥有效且有权访问 OpenAI 模型。",
+    "modelSelectLabel": "选择 OpenAI 模型",
+    "modelSelectPlaceholder": "选择一个模型",
+    "searchModelsPlaceholder": "搜索模型...",
+    "noModelFound": "未找到模型。",
+    "enableWebGrounding": "启用网络搜索",
+    "webGroundingDescription": "如果启用，模型在可用时可以使用网络搜索作为信息来源。"
+  },
+  "GoogleConfig": {
+    "apiKeyLabel": "谷歌 API 密钥",
+    "noModelsFound": "未找到模型。请确保您的 API 密钥有效且有权访问谷歌模型。",
+    "modelSelectLabel": "选择谷歌模型"
+  },
+  "AnthropicConfig": {
+    "apiKeyLabel": "Anthropic API 密钥",
+    "apiKeyPlaceholder": "输入您的 Anthropic API 密钥",
+    "noModelsFound": "未找到模型。请确保您的 API 密钥有效且有权访问 Anthropic 模型。",
+    "modelSelectLabel": "选择 Anthropic 模型"
+  },
+  "OllamaConfig": {
+    "useCustomUrl": "使用自定义 Ollama URL",
+    "ollamaUrlLabel": "Ollama URL",
+    "ollamaUrlPlaceholder": "输入您的 Ollama URL",
+    "ollamaUrlDescription": "如果您正在使用自定义的 Ollama 实例，请更改此项",
+    "modelSelectLabel": "选择一个支持的模型",
+    "loadingModels": "正在加载模型...",
+    "noModelsAvailable": "没有可用的模型。请检查您的 Ollama 连接。"
+  },
+  "CustomConfig": {
+    "urlLabel": "OpenAI 兼容 URL",
+    "urlPlaceholder": "输入您的 URL",
+    "apiKeyLabel": "OpenAI 兼容 API 密钥",
+    "apiKeyPlaceholder": "输入您的 API 密钥",
+    "noModelsFound": "未找到模型。请确保您的 API 密钥有效且有权访问模型。",
+    "importantNote": "重要提示：只有具备函数调用（工具调用）或 JSON schema 支持能力的模型才能正常工作。",
+    "modelSelectLabel": "选择模型",
+    "useToolCalls": "使用工具调用",
+    "toolCallsDescription": "如果启用，将使用工具调用（Tool Calls）代替 JSON Schema 来进行结构化输出。",
+    "disableThinking": "禁用思考过程",
+    "disableThinkingDescription": "如果启用，“思考”过程将被禁用。"
+  },
+  "UploadPage": {
+    "errors": {
+      "selectSlidesAndLanguage": "请选择幻灯片数量和语言",
+      "noPromptOrDocument": "未提供提示或文档",
+      "genericError": "错误",
+      "genericErrorDescription": "上传页面出错。"
+    },
+    "loading": {
+      "processingDocuments": "正在处理文档...",
+      "largeDocumentsWarning": "处理大型文档可能需要几分钟。",
+      "generatingOutlines": "正在生成大纲..."
+    },
+    "nextButton": "下一步"
+  },
+  "ConfigurationSelects": {
+    "slides": "张幻灯片",
+    "selectSlidesPlaceholder": "选择幻灯片数量",
+    "customSlideCountPlaceholder": "自定义",
+    "selectLanguagePlaceholder": "选择语言",
+    "searchLanguagePlaceholder": "搜索语言...",
+    "noLanguageFound": "未找到语言。"
+  },
+  "PromptInput": {
+    "placeholder": "告诉我们您想做什么样的演示文稿",
+    "hint": "请提供有关您演示文稿需求的具体细节（例如：主题、风格、要点），以便获得更准确的结果"
+  },
+  "SupportingDoc": {
+    "title": "辅助文档",
+    "dropzone": {
+      "default": "将文件拖放到此处，或点击下方按钮",
+      "dragging": "在此处释放文件"
+    },
+    "supportedFormats": "支持 PDF、文本文件、PPTX、DOCX",
+    "chooseFilesButton": "选择文件",
+    "selectedFilesTitle": "已选文件 ({count})",
+    "unnamedFile": "未命名文件",
+    "removeFileAriaLabel": "移除文件",
+    "toasts": {
+      "invalidFileTypeTitle": "文件类型无效",
+      "invalidFileTypeDescription": "请仅上传 PDF、TXT、PPTX 或 DOCX 文件",
+      "multiplePdfsErrorTitle": "不允许上传多个 PDF 文件",
+      "multiplePdfsErrorDescription": "请只选择一个 PDF 文件",
+      "filesSelectedTitle": "已选择文件",
+      "filesSelectedDescription": "已添加 {count} 个文件"
+    }
+  },
+  "DocumentPreview": {
+    "contentTitle": "内容:",
+    "sidebarTitle": "文档",
+    "openPanelTooltip": "打开面板",
+    "nextButton": "下一步",
+    "toasts": {
+      "readError": "读取文档内容失败",
+      "creationErrorTitle": "错误",
+      "creationErrorDescription": "创建演示文稿时出错。"
+    },
+    "loading": {
+      "generatingOutline": "正在生成演示文稿大纲..."
+    },
+    "altTexts": {
+      "documentIcon": "文档图标"
+    }
+  },
+  "OutlinePage": {
+    "tabs": {
+      "outline": "大纲与内容",
+      "layouts": "选择模板"
+    }
+  },
+  "GenerateButton": {
+    "generate": "生成",
+    "generating": "正在生成...",
+    "selectLayout": "选择布局"
+  },
+  "PresentationGeneration": {
+    "noOutlinesError": "没有大纲",
+    "noOutlinesDescription": "请等待大纲加载完毕后再生成演示文稿",
+    "selectLayoutError": "选择布局组",
+    "selectLayoutDescription": "请在生成演示文稿前选择一个布局组",
+    "noSlideSchemaError": "未找到幻灯片结构",
+    "noSlideSchemaDescription": "请在生成演示文稿前选择一个分组",
+    "generationError": "生成错误",
+    "generationErrorDescription": "在准备演示文稿时发生错误。",
+    "loadingMessage": "正在生成演示文稿数据..."
+  },
+  "OutlineContent": {
+    "thinking": "思考中",
+    "addSlide": "+ 添加幻灯片",
+    "noOutlines": "无可用大纲",
+    "addFirstSlide": "+ 添加第一张幻灯片"
+  },
+  "LayoutSelection": {
+    "noTemplatesTitle": "无可用模板",
+    "noTemplatesDescription": "无法加载演示文稿模板。请尝试刷新页面。",
+    "inBuiltTemplatesTitle": "内置模板",
+    "customAITemplatesTitle": "自定义 AI 模板",
+    "noCustomTemplates": "没有自定义模板。请从“创建模板”菜单创建一个。"
+  },
+  "EmptyStateView": {
+    "title": "未找到演示文稿",
+    "description": "您要查找的演示文稿似乎不存在。让我们来创建一个全新的演示文稿吧！",
+    "createButton": "创建新演示文稿"
+  },
+  "PresentationPage": {
+    "errorTitle": "出错了",
+    "errorDescription": "我们无法加载您的演示文稿。请再试一次。",
+    "refreshButton": "刷新页面"
+  },
+  "PresentationHeader": {
+    "exportAsPdf": "导出为 PDF",
+    "exportAsPptx": "导出为 PPTX",
+    "regenerate": "重新生成",
+    "undo": "撤销",
+    "redo": "重做",
+    "present": "演示",
+    "export": "导出",
+    "exporting": "正在导出演示文稿...",
+    "toasts": {
+      "exportErrorTitle": "导出时遇到问题！",
+      "exportErrorDescription": "我们无法导出您的演示文稿。请再试一次。"
+    },
+    "altTexts": {
+      "pdfIcon": "导出为 pdf",
+      "pptxIcon": "导出为 pptx",
+      "logo": "演示文稿 logo"
+    }
+  },
+  "SidePanel": {
+    "openPanel": "打开面板",
+    "showPanel": "显示面板",
+    "imagePreview": "图片预览",
+    "listPreview": "列表预览",
+    "slide": "幻灯片"
+  },
+  "HelpCenter": {
+    "ariaLabel": "帮助中心",
+    "title": "帮助中心",
+    "searchPlaceholder": "搜索帮助主题...",
+    "allCategory": "全部",
+    "noResults": "未找到关于 “{query}” 的结果",
+    "clearSearch": "清除搜索",
+    "footer": "仍需帮助？ <link>联系支持</link>",
+    "questions": [
+      {
+        "id": 1,
+        "category": "图片",
+        "question": "如何更换图片？",
+        "answer": "点击任意图片即可显示图片工具栏。您将看到编辑、调整位置以及更改图片适应容器方式的选项。“编辑”选项允许您替换或修改当前图片。"
+      },
+      {
+        "id": 2,
+        "category": "图片",
+        "question": "我可以用 AI 生成新图片吗？",
+        "answer": "是的！点击任意图片，从工具栏中选择“编辑”选项。在出现的侧边栏中，您会找到“AI 生成”标签页。输入描述您想要图片的提示，我们的人工智能将根据您的描述生成图片。"
+      },
+      {
+        "id": 3,
+        "category": "图片",
+        "question": "如何上传我自己的图片？",
+        "answer": "点击任意图片，然后从工具栏中选择“编辑”。在侧边栏中，点击顶部的“上传”标签页。您可以浏览您的文件进行选择。上传后，您可以将其应用到您的设计中。"
+      },
+      {
+        "id": 11,
+        "category": "AI 提示",
+        "question": "我可以通过提示更改幻灯片布局吗？",
+        "answer": "是的，您可以！点击每张幻灯片左上角的“魔棒”图标，它会给您一个提示输入框。描述您的布局要求，AI 将相应地更改幻灯片布局。"
+      },
+      {
+        "id": 12,
+        "category": "AI 提示",
+        "question": "我可以通过提示更改幻灯片图片吗？",
+        "answer": "是的，您可以！点击每张幻灯片左上角的“魔棒”图标，它会给您一个提示输入框。描述您想要的图片，AI 将根据您的要求更新幻灯片图片。"
+      },
+      {
+        "id": 14,
+        "category": "AI 提示",
+        "question": "我可以通过提示更改内容吗？",
+        "answer": "是的，您可以！点击每张幻灯片左上角的“魔棒”图标，它会给您一个提示输入框。描述您想要的内容，AI 将根据您的描述更新幻灯片的文本和内容。"
+      },
+      {
+        "id": 4,
+        "category": "文本",
+        "question": "如何格式化和高亮文本？",
+        "answer": "选择任意文本即可看到格式化工具栏出现。您将有粗体、斜体、下划线、删除线等选项。"
+      },
+      {
+        "id": 5,
+        "category": "图标",
+        "question": "如何更换图标？",
+        "answer": "点击任何现有图标进行修改。在图标选择器面板中，您可以浏览图标或使用搜索功能查找特定图标。我们提供数千种不同风格的图标。"
+      },
+      {
+        "id": 16,
+        "category": "布局",
+        "question": "我可以改变幻灯片的位置吗？",
+        "answer": "当然可以，在侧面板上，您可以拖动幻灯片并将其放置在任何您想要的位置。"
+      },
+      {
+        "id": 15,
+        "category": "布局",
+        "question": "我可以在幻灯片之间添加新的幻灯片吗？",
+        "answer": "是的，您只需点击每张幻灯片下方的加号图标。它将显示所有布局，供您选择所需的布局。"
+      },
+      {
+        "id": 6,
+        "category": "布局",
+        "question": "我可以给我的幻灯片添加更多部分吗？",
+        "answer": "当然可以！将鼠标悬停在任何文本框或内容块的底部附近，您会看到一个“+”图标出现。点击此按钮可在当前部分下方添加一个新部分。您也可以使用“插入”菜单添加特定的部分类型。"
+      },
+      {
+        "id": 8,
+        "category": "导出",
+        "question": "如何下载或导出我的演示文稿？",
+        "answer": "点击右上角菜单中的“导出”按钮。您可以选择下载为 PDF、PowerPoint。"
+      }
+    ]
+  },
+  "LoadingState": {
+    "title": "正在创建您的演示文稿",
+    "tips": [
+      "我们正在用 AI 魔法精心制作您的演示文稿 ✨",
+      "正在分析您的内容以生成完美的幻灯片 📊",
+      "正在组织信息以实现最大影响力 🎯",
+      "正在添加视觉元素以吸引您的观众 🎨",
+      "就快好了！正在进行最后的润色 ⚡️"
+    ]
+  },
+  "Dashboard": {
+    "title": "幻灯片演示"
+  },
+  "PresentationGrid": {
+    "createNewPresentation": "创建新演示文稿",
+    "createVideoPresentation": "创建视频演示",
+    "startFromScratch": "从头开始，将您的想法变为现实",
+    "tryAgain": "重试"
+  },
+  "PresentationCard": {
+    "delete": "删除",
+    "toasts": {
+      "deletedSuccess": "演示文稿已删除",
+      "deletedSuccessDescription": "该演示文稿已成功删除",
+      "deletedError": "删除演示文稿时出错"
+    }
+  }
+}

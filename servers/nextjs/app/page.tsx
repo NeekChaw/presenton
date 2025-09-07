@@ -1,9 +1,5 @@
-import Home from "@/components/Home"
-
-const page = () => {
-    return (
-        <Home />
-    )
+import {redirect} from 'next/navigation';
+ 
+export default function RootPage() {
+  redirect('/en');
 }
-
-export default page

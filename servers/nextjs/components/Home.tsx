@@ -14,6 +14,7 @@ import {
 import { LLMConfig } from "@/types/llm_config";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
 import { usePathname } from "next/navigation";
+import {useTranslations} from 'next-intl';
 
 // Button state interface
 interface ButtonState {
@@ -26,6 +27,7 @@ interface ButtonState {
 }
 
 export default function Home() {
+  const t = useTranslations('Home');
   const router = useRouter();
   const pathname = usePathname();
   const config = useSelector((state: RootState) => state.userConfig);
@@ -147,10 +149,10 @@ export default function Home() {
         {/* Branding Header */}
         <div className="text-center mb-2 mt-4 flex-shrink-0">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <img src="/Logo.png" alt="Presenton Logo" className="h-12" />
+            <img src="/Logo.png" alt={t('logoAlt')} className="h-12" />
           </div>
           <p className="text-gray-600 text-sm">
-            Open-source AI presentation generator
+            {t('tagline')}
           </p>
         </div>
 

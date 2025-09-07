@@ -1,5 +1,6 @@
 "use client";
 import React, {  useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +27,7 @@ import { usePresentationUndoRedo } from "../hooks/PresentationUndoRedo";
 const PresentationPage: React.FC<PresentationPageProps> = ({
   presentation_id,
 }) => {
+  const t = useTranslations('PresentationPage');
   const pathname = usePathname();
   // State management
   const [loading, setLoading] = useState(true);
@@ -112,11 +114,11 @@ const PresentationPage: React.FC<PresentationPageProps> = ({
           role="alert"
         >
           <AlertCircle className="w-16 h-16 mb-4 text-red-500" />
-          <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('errorTitle')}</h2>
           <p className="text-center mb-4">
-            We couldn't load your presentation. Please try again.
+            {t('errorDescription')}
           </p>
-          <Button onClick={() => { trackEvent(MixpanelEvent.PresentationPage_Refresh_Page_Button_Clicked, { pathname }); window.location.reload(); }}>Refresh Page</Button>
+          <Button onClick={() => { trackEvent(MixpanelEvent.PresentationPage_Refresh_Page_Button_Clicked, { pathname }); window.location.reload(); }}>{t('refreshButton')}</Button>
         </div>
       </div>
     );

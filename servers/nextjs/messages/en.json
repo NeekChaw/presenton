@@ -1,0 +1,332 @@
+{
+  "Home": {
+    "logoAlt": "Presenton Logo",
+    "tagline": "Open-source AI presentation generator",
+    "pageTitle": "Presenton | AI-Powered Presentation Generator",
+    "title": "The Easiest Way to Create Presentations with AI",
+    "description": "Just provide a topic, a document, or a description, and let our AI generate a professional presentation for you in minutes.",
+    "ctaButton": "Get Started",
+    "githubLink": "View on GitHub"
+  },
+  "Header": {
+    "createTemplate": "Create Template",
+    "templates": "Templates"
+  },
+  "LLMSelection": {
+    "tabs": {
+      "openai": "OpenAI",
+      "google": "Google",
+      "anthropic": "Anthropic",
+      "ollama": "Ollama",
+      "custom": "Custom"
+    },
+    "imageProviderLabel": "Select Image Provider",
+    "searchProviderPlaceholder": "Search provider...",
+    "noProviderFound": "No provider found.",
+    "selectImageProvider": "Select image provider",
+    "apiKeyInfo": "API key for {provider} image generation",
+    "selectedModelsTitle": "Selected Models",
+    "selectedModelsInfo": "Using {textModel} for text generation and {imageModel} for images",
+    "button": {
+      "saveConfiguration": "Save Configuration",
+      "savingConfiguration": "Saving Configuration...",
+      "selectModel": "Please Select a Model",
+      "enterApiKey": "Please Enter API Key",
+      "enterOllamaUrl": "Please Enter Ollama URL"
+    }
+  },
+  "OpenAIConfig": {
+    "apiKeyLabel": "OpenAI API Key",
+    "apiKeyPlaceholder": "Enter your OpenAI API key",
+    "apiKeyDescription": "Your API key for the OpenAI service.",
+    "apiUrlLabel": "API Base URL",
+    "apiUrlPlaceholder": "Enter the API Base URL (e.g., https://api.openai.com/v1)",
+    "apiUrlDescription": "Optional. Use for proxies or other compatible services.",
+    "checkModelsButton": "Check for available models",
+    "checkingModelsButton": "Checking...",
+    "noModelsFound": "No models found. Please check your API key and URL.",
+    "modelSelectLabel": "Select OpenAI Model",
+    "modelSelectPlaceholder": "Select a model",
+    "searchModelsPlaceholder": "Search models...",
+    "noModelFound": "No model found.",
+    "enableWebGrounding": "Enable Web Grounding",
+    "webGroundingDescription": "If enabled, the model can use web search grounding when available."
+  },
+  "GoogleConfig": {
+    "apiKeyLabel": "Google API Key",
+    "noModelsFound": "No models found. Please make sure your API key is valid and has access to Google models.",
+    "modelSelectLabel": "Select Google Model"
+  },
+  "AnthropicConfig": {
+    "apiKeyLabel": "Anthropic API Key",
+    "apiKeyPlaceholder": "Enter your Anthropic API key",
+    "noModelsFound": "No models found. Please make sure your API key is valid and has access to Anthropic models.",
+    "modelSelectLabel": "Select Anthropic Model"
+  },
+  "OllamaConfig": {
+    "useCustomUrl": "Use custom Ollama URL",
+    "ollamaUrlLabel": "Ollama URL",
+    "ollamaUrlPlaceholder": "Enter your Ollama URL",
+    "ollamaUrlDescription": "Change this if you are using a custom Ollama instance",
+    "modelSelectLabel": "Choose a supported model",
+    "loadingModels": "Loading models...",
+    "noModelsAvailable": "No models available. Please check your Ollama connection."
+  },
+  "CustomConfig": {
+    "title": "Custom LLM Configuration",
+    "apiUrlLabel": "API URL",
+    "apiUrlPlaceholder": "Enter the custom LLM API URL",
+    "apiUrlDescription": "The full URL of the custom LLM API endpoint.",
+    "apiKeyLabel": "API Key",
+    "apiKeyPlaceholder": "Enter your API key",
+    "apiKeyDescription": "Your API key for the custom LLM service.",
+    "modelSelectLabel": "Model",
+    "modelSelectPlaceholder": "Select a model",
+    "modelInputPlaceholder": "Enter the model name",
+    "modelInputDescription": "Specify the model to use for generating presentations."
+  },
+  "UploadPage": {
+    "errors": {
+      "selectSlidesAndLanguage": "Please select number of Slides & Language",
+      "noPromptOrDocument": "No Prompt or Document Provided",
+      "genericError": "Error",
+      "genericErrorDescription": "Error in upload page."
+    },
+    "loading": {
+      "processingDocuments": "Processing documents...",
+      "largeDocumentsWarning": "It might take a few minutes for large documents.",
+      "generatingOutlines": "Generating outlines..."
+    },
+    "nextButton": "Next"
+  },
+  "ConfigurationSelects": {
+    "slides": "slides",
+    "selectSlidesPlaceholder": "Select Slides",
+    "customSlideCountPlaceholder": "--",
+    "selectLanguagePlaceholder": "Select language",
+    "searchLanguagePlaceholder": "Search language...",
+    "noLanguageFound": "No language found."
+  },
+  "PromptInput": {
+    "placeholder": "Tell us about your presentation",
+    "hint": "Provide specific details about your presentation needs (e.g., topic, style, key points) for more accurate results"
+  },
+  "SupportingDoc": {
+    "title": "Supporting Documents",
+    "dropzone": {
+      "default": "Drag and drop your file here or click below button",
+      "dragging": "Drop your file here"
+    },
+    "supportedFormats": "Supports PDFs, Text files, PPTX, DOCX",
+    "chooseFilesButton": "Choose Files",
+    "selectedFilesTitle": "Selected Files ({count})",
+    "unnamedFile": "Unnamed File",
+    "removeFileAriaLabel": "Remove file",
+    "toasts": {
+      "invalidFileTypeTitle": "Invalid file type",
+      "invalidFileTypeDescription": "Please upload only PDF, TXT, PPTX, or DOCX files",
+      "multiplePdfsErrorTitle": "Multiple PDF files are not allowed",
+      "multiplePdfsErrorDescription": "Please select only one PDF file",
+      "filesSelectedTitle": "Files selected",
+      "filesSelectedDescription": "{count} file(s) have been added"
+    }
+  },
+  "DocumentPreview": {
+    "contentTitle": "Content:",
+    "sidebarTitle": "DOCUMENTS",
+    "openPanelTooltip": "Open Panel",
+    "nextButton": "Next",
+    "toasts": {
+      "readError": "Failed to read document content",
+      "creationErrorTitle": "Error",
+      "creationErrorDescription": "Error in radar presentation creation."
+    },
+    "loading": {
+      "generatingOutline": "Generating presentation outline..."
+    },
+    "altTexts": {
+      "documentIcon": "Document icon"
+    }
+  },
+  "OutlinePage": {
+    "tabs": {
+      "outline": "Outline & Content",
+      "layouts": "Select Template"
+    }
+  },
+  "GenerateButton": {
+    "generate": "Generate",
+    "generating": "Generating...",
+    "selectLayout": "Select Layout"
+  },
+  "PresentationGeneration": {
+    "noOutlinesError": "No Outlines",
+    "noOutlinesDescription": "Please wait for outlines to load before generating presentation",
+    "selectLayoutError": "Select Layout Group",
+    "selectLayoutDescription": "Please select a layout group before generating presentation",
+    "noSlideSchemaError": "No Slide Schema found",
+    "noSlideSchemaDescription": "Please select a Group before generating presentation",
+    "generationError": "Generation Error",
+    "generationErrorDescription": "Error In Presentation Generation(prepare).",
+    "loadingMessage": "Generating presentation data..."
+  },
+  "OutlineContent": {
+    "thinking": "Thinking",
+    "addSlide": "+ Add Slide",
+    "noOutlines": "No outlines available",
+    "addFirstSlide": "+ Add First Slide"
+  },
+  "LayoutSelection": {
+    "noTemplatesTitle": "No Templates Available",
+    "noTemplatesDescription": "No presentation templates could be loaded. Please try refreshing the page.",
+    "inBuiltTemplatesTitle": "In Built Templates",
+    "customAITemplatesTitle": "Custom AI Templates",
+    "noCustomTemplates": "No custom templates. Create one from \"Create Template\" menu."
+  },
+  "EmptyStateView": {
+    "title": "No Presentation Found",
+    "description": "It looks like the presentation you are looking for is not found. Let's create a brand new presentation!",
+    "createButton": "Create New Presentation"
+  },
+  "PresentationPage": {
+    "errorTitle": "Something went wrong",
+    "errorDescription": "We couldn't load your presentation. Please try again.",
+    "refreshButton": "Refresh Page"
+  },
+  "PresentationHeader": {
+    "exportAsPdf": "Export as PDF",
+    "exportAsPptx": "Export as PPTX",
+    "regenerate": "Re-Generate",
+    "undo": "Undo",
+    "redo": "Redo",
+    "present": "Present",
+    "export": "Export",
+    "exporting": "Exporting presentation...",
+    "toasts": {
+      "exportErrorTitle": "Having trouble exporting!",
+      "exportErrorDescription": "We are having trouble exporting your presentation. Please try again."
+    },
+    "altTexts": {
+      "pdfIcon": "pdf export",
+      "pptxIcon": "pptx export",
+      "logo": "Presentation logo"
+    }
+  },
+  "SidePanel": {
+    "openPanel": "Open Panel",
+    "showPanel": "Show Panel",
+    "imagePreview": "Image Preview",
+    "listPreview": "List Preview",
+    "slide": "Slide"
+  },
+  "HelpCenter": {
+    "ariaLabel": "Help Center",
+    "title": "Help Center",
+    "searchPlaceholder": "Search help topics...",
+    "allCategory": "All",
+    "noResults": "No results found for \"{query}\"",
+    "clearSearch": "Clear search",
+    "footer": "Still need help? <link>Contact Support</link>",
+    "questions": [
+      {
+        "id": 1,
+        "category": "Images",
+        "question": "How do I change an image?",
+        "answer": "Click on any image to reveal the image toolbar. You'll see options to Edit, Adjust position, and change how the image fits within its container. The Edit option allows you to replace or modify the current image."
+      },
+      {
+        "id": 2,
+        "category": "Images",
+        "question": "Can I generate new images with AI?",
+        "answer": "Yes! Click on any image and select the Edit option from the toolbar. In the side panel that appears, you'll find the AI Generate tab. Enter your prompt describing the image you want, and our AI will generate an image based on your description."
+      },
+      {
+        "id": 3,
+        "category": "Images",
+        "question": "How do I upload my own images?",
+        "answer": "Click on any image, then select Edit from the toolbar. In the side panel, click on the Upload tab at the top. You can browse your files to select one. Once uploaded, you can apply it to your design."
+      },
+      {
+        "id": 11,
+        "category": "AI Prompts",
+        "question": "Can I change slide layout through prompt?",
+        "answer": "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe your layout requirements and the AI will change the slide layout accordingly."
+      },
+      {
+        "id": 12,
+        "category": "AI Prompts",
+        "question": "Can I change slide image through prompt?",
+        "answer": "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe the image you want and the AI will update the slide image based on your requirements."
+      },
+      {
+        "id": 14,
+        "category": "AI Prompts",
+        "question": "Can I change content through prompt?",
+        "answer": "Yes you can! Click on the WandSparkles icon on the top left of each slide and it will give you a prompt input box. Describe what content you want and the AI will update the slide's text and content based on your description."
+      },
+      {
+        "id": 4,
+        "category": "Text",
+        "question": "How can I format and highlight text?",
+        "answer": "Select any text to see the formatting toolbar appear. You'll have options for Bold, Italic, Underline, Strikethrough,and more."
+      },
+      {
+        "id": 5,
+        "category": "Icons",
+        "question": "How do I change icons?",
+        "answer": "Click on any existing icon to modify it. In the icon selector panel, you can browse icos or use the search function to find specific icons. We offer thousands of icons in various styles."
+      },
+      {
+        "id": 16,
+        "category": "Layout",
+        "question": "Can I change the position of slide?",
+        "answer": "Of course, On side panel you can drag the slide and place wherever you want."
+      },
+      {
+        "id": 15,
+        "category": "Layout",
+        "question": "Can I add new slide between the slide?",
+        "answer": "Yes you can just click on the plus icon below each slide.It will display the all the layouts and choose required one."
+      },
+      {
+        "id": 6,
+        "category": "Layout",
+        "question": "Can I add more sections to my slides?",
+        "answer": "Absolutely! Hover near the bottom of any text box or content block, and you'll see a + icon appear. Click this button to add a new section below the current one. You can also use the Insert menu to add specific section types."
+      },
+      {
+        "id": 8,
+        "category": "Export",
+        "question": "How do I download or export my presentation?",
+        "answer": "Click the Export button in the top right menu. You can choose to download as PDF, PowerPoint."
+      }
+    ]
+  },
+  "LoadingState": {
+    "title": "Creating Your Presentation",
+    "tips": [
+      "We're crafting your presentation with AI magic ✨",
+      "Analyzing your content for perfect slides 📊",
+      "Organizing information for maximum impact 🎯",
+      "Adding visual elements to engage your audience 🎨",
+      "Almost there! Putting final touches ⚡️"
+    ]
+  },
+  "Dashboard": {
+    "title": "Slide Presentation"
+  },
+  "PresentationGrid": {
+    "createNewPresentation": "Create New Presentation",
+    "createVideoPresentation": "Create Video Presentation",
+    "startFromScratch": "Start from scratch and bring your ideas to life",
+    "tryAgain": "Try again"
+  },
+  "PresentationCard": {
+    "delete": "Delete",
+    "toasts": {
+      "deletedSuccess": "Presentation deleted",
+      "deletedSuccessDescription": "The presentation has been deleted successfully",
+      "deletedError": "Error deleting presentation"
+    }
+  }
+}

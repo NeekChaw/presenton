@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { PresentationCard } from "./PresentationCard";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ export const PresentationGrid = ({
   error = null,
   onPresentationDeleted,
 }: PresentationGridProps) => {
+  const t = useTranslations('PresentationGrid');
   const router = useRouter();
   const handleCreateNewPresentation = () => {
     if (type === "slide") {
@@ -48,10 +50,10 @@ export const PresentationGrid = ({
       </div>
       <div className="text-center">
         <h3 className="font-semibold text-gray-700 group-hover:text-gray-900 mb-1">
-          Create {type === "slide" ? "New" : "Video"} Presentation
+          {type === "slide" ? t('createNewPresentation') : t('createVideoPresentation')}
         </h3>
         <p className="text-sm text-gray-500 group-hover:text-gray-600 px-4">
-          Start from scratch and bring your ideas to life
+          {t('startFromScratch')}
         </p>
       </div>
     </div>
@@ -87,7 +89,7 @@ export const PresentationGrid = ({
               onClick={() => window.location.reload()}
               className="text-primary hover:text-primary/80 underline"
             >
-              Try again
+              {t('tryAgain')}
             </button>
           </div>
         </div>

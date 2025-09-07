@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useTranslations } from 'next-intl';
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -18,6 +19,7 @@ import { Switch } from "./ui/switch";
 interface OpenAIConfigProps {
   openaiApiKey: string;
   openaiModel: string;
+  openaiUrl?: string;
   webGrounding?: boolean;
   onInputChange: (value: string | boolean, field: string) => void;
 }
@@ -25,16 +27,16 @@ interface OpenAIConfigProps {
 export default function OpenAIConfig({
   openaiApiKey,
   openaiModel,
+  openaiUrl,
   webGrounding,
   onInputChange
 }: OpenAIConfigProps) {
+  const t = useTranslations('OpenAIConfig');
   const [openModelSelect, setOpenModelSelect] = useState(false);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [modelsChecked, setModelsChecked] = useState(false);
   const [apiKey, setApiKey] = useState(openaiApiKey);
-
-  const openaiUrl = "https://api.openai.com/v1";
 
   useEffect(() => {
     setAvailableModels([]);
@@ -45,6 +47,10 @@ export default function OpenAIConfig({
   const onApiKeyChange = (value: string) => {
     setApiKey(value);
     onInputChange(value, "openai_api_key");
+  };
+
+  const onApiUrlChange = (value: string) => {
+    onInputChange(value, "openai_url");
   };
 
   const fetchAvailableModels = async () => {
@@ -58,7 +64,7 @@ export default function OpenAIConfig({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          url: openaiUrl,
+          url: openaiUrl || "https://api.openai.com/v1",
           api_key: openaiApiKey
         }),
       });
@@ -88,7 +94,7 @@ export default function OpenAIConfig({
       {/* API Key Input */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          OpenAI API Key
+          {t('apiKeyLabel')}
         </label>
         <div className="relative">
           <input
@@ -96,16 +102,36 @@ export default function OpenAIConfig({
             value={openaiApiKey}
             onChange={(e) => onApiKeyChange(e.target.value)}
             className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
-            placeholder="Enter your API key"
+            placeholder={t('apiKeyPlaceholder')}
           />
         </div>
         <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
           <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-          Your API key will be stored locally and never shared
+          {t('apiKeyDescription')}
         </p>
       </div>
 
 
+
+      {/* API URL Input */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {t('apiUrlLabel')}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            value={openaiUrl}
+            onChange={(e) => onApiUrlChange(e.target.value)}
+            className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            placeholder={t('apiUrlPlaceholder')}
+          />
+        </div>
+        <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
+          <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
+          {t('apiUrlDescription')}
+        </p>
+      </div>
 
       {/* Check for available models button - show when no models checked or no models found */}
       {(!modelsChecked || (modelsChecked && availableModels.length === 0)) && (
@@ -121,10 +147,10 @@ export default function OpenAIConfig({
             {modelsLoading ? (
               <div className="flex items-center justify-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Checking for models...
+                {t('checkingModelsButton')}
               </div>
             ) : (
-              "Check for available models"
+              t('checkModelsButton')
             )}
           </button>
         </div>
@@ -134,7 +160,7 @@ export default function OpenAIConfig({
       {modelsChecked && availableModels.length === 0 && (
         <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-sm text-yellow-800">
-            No models found. Please make sure your API key is valid and has access to OpenAI models.
+            {t('noModelsFound')}
           </p>
         </div>
       )}
@@ -143,7 +169,7 @@ export default function OpenAIConfig({
       {modelsChecked && availableModels.length > 0 ? (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
-            Select OpenAI Model
+            {t('modelSelectLabel')}
           </label>
           <div className="w-full">
             <Popover
@@ -161,7 +187,7 @@ export default function OpenAIConfig({
                     <span className="text-sm font-medium text-gray-900">
                       {openaiModel
                         ? availableModels.find(model => model === openaiModel) || openaiModel
-                        : "Select a model"}
+                        : t('modelSelectPlaceholder')}
                     </span>
                   </div>
                   <ChevronsUpDown className="w-4 h-4 text-gray-500" />
@@ -173,9 +199,9 @@ export default function OpenAIConfig({
                 style={{ width: "var(--radix-popover-trigger-width)" }}
               >
                 <Command>
-                  <CommandInput placeholder="Search models..." />
+                  <CommandInput placeholder={t('searchModelsPlaceholder')} />
                   <CommandList>
-                    <CommandEmpty>No model found.</CommandEmpty>
+                    <CommandEmpty>{t('noModelFound')}</CommandEmpty>
                     <CommandGroup>
                       {availableModels.map((model, index) => (
                         <CommandItem
@@ -218,7 +244,7 @@ export default function OpenAIConfig({
       <div>
         <div className="flex items-center justify-between mb-4 bg-green-50 p-2 rounded-sm">
           <label className="text-sm font-medium text-gray-700">
-            Enable Web Grounding
+            {t('enableWebGrounding')}
           </label>
           <Switch
             checked={!!webGrounding}
@@ -227,7 +253,7 @@ export default function OpenAIConfig({
         </div>
         <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
           <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-          If enabled, the model can use web search grounding when available.
+          {t('webGroundingDescription')}
         </p>
       </div>
     </div>
