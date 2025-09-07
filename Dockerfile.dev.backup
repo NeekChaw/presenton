@@ -1,0 +1,70 @@
+FROM python:3.11-slim-bookworm
+
+# Configure apt for better reliability
+RUN echo 'APT::Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'APT::Acquire::http::Timeout "60";' >> /etc/apt/apt.conf.d/80-retries && \
+    echo 'APT::Acquire::http::Pipeline-Depth "0";' >> /etc/apt/apt.conf.d/80-retries
+
+# Add multiple mirrors for better reliability
+RUN echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+    echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list && \
+    echo "deb http://ftp.debian.org/debian bookworm main" >> /etc/apt/sources.list
+
+# Install Node.js and npm with retry logic
+RUN for i in 1 2 3; do \
+      apt-get update && \
+      apt-get install -y --fix-missing \
+        nginx \
+        curl \
+        libreoffice \
+        fontconfig \
+        imagemagick && \
+      break || sleep 10; \
+    done
+
+RUN sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
+
+
+# Install Node.js 20 using NodeSource repository
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+  apt-get install -y nodejs
+
+
+# Change working directory
+WORKDIR /app
+
+RUN ls -a
+
+# Set environment variables
+ENV APP_DATA_DIRECTORY=/app_data
+ENV TEMP_DIRECTORY=/tmp/presenton
+# ENV PYTHONPATH="${PYTHONPATH}:/app/servers/fastapi"
+
+# Install ollama
+RUN curl -fsSL http://ollama.com/install.sh | sh
+
+# Install dependencies for FastAPI
+RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
+  pathvalidate pdfplumber chromadb sqlmodel \
+  anthropic google-genai openai fastmcp
+RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Install dependencies for Next.js
+WORKDIR /node_dependencies
+COPY servers/nextjs/package.json servers/nextjs/package-lock.json ./
+RUN npm install --verbose
+
+# Install chrome for puppeteer
+RUN npx puppeteer browsers install chrome@138.0.7204.94 --install-deps
+
+RUN chmod -R 777 /node_dependencies
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose the port
+EXPOSE 80
+
+# Start the servers
+CMD ["node", "/app/start.js", "--dev"]

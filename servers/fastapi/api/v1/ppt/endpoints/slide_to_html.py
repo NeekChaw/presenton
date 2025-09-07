@@ -7,6 +7,8 @@ from fastapi import APIRouter, HTTPException, File, UploadFile, Form, Depends
 from pydantic import BaseModel
 from openai import OpenAI
 from openai import APIError
+from utils.get_env import get_openai_api_key_env, get_openai_url_env, get_openai_model_env, get_llm_provider_env
+from utils.user_config import get_user_config
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func
 from utils.asset_directory_utils import get_images_directory
@@ -120,15 +122,17 @@ class TemplateInfo(BaseModel):
     created_at: Optional[datetime] = None
 
 
-async def generate_html_from_slide(base64_image: str, media_type: str, xml_content: str, api_key: str, fonts: Optional[List[str]] = None) -> str:
+async def generate_html_from_slide(base64_image: str, media_type: str, xml_content: str, api_key: str, base_url: str, model_name: str, fonts: Optional[List[str]] = None) -> str:
     """
-    Generate HTML content from slide image and XML using OpenAI GPT-5 Responses API.
+    Generate HTML content from slide image and XML using OpenAI compatible API.
     
     Args:
         base64_image: Base64 encoded image data
         media_type: MIME type of the image (e.g., 'image/png')
         xml_content: OXML content as text
-        api_key: OpenAI API key
+        api_key: API key
+        base_url: API base URL
+        model_name: Model name to use
         fonts: Optional list of normalized root font families to prefer in output
     
     Returns:
@@ -137,9 +141,9 @@ async def generate_html_from_slide(base64_image: str, media_type: str, xml_conte
     Raises:
         HTTPException: If API call fails or no content is generated
     """
-    print(f"Generating HTML from slide image and XML using OpenAI GPT-5 Responses API...")
+    print(f"Generating HTML from slide image and XML using {model_name} via {base_url}...")
     try:
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, base_url=base_url)
 
         # Compose input for Responses API. Include system prompt, image (separate), OXML and optional fonts text.
         data_url = f"data:{media_type};base64,{base64_image}"
@@ -156,16 +160,38 @@ async def generate_html_from_slide(base64_image: str, media_type: str, xml_conte
             },
         ]
 
-        print("Making Responses API request for HTML generation...")
-        response = client.responses.create(
-            model="gpt-5",
-            input=input_payload,
-            reasoning={"effort": "high"},
-            text={"verbosity": "low"},
-        )
+        print(f"Making API request for HTML generation with model {model_name}...")
+        
+        # Use responses API if available (OpenAI), otherwise use chat completions
+        try:
+            response = client.responses.create(
+                model=model_name,
+                input=input_payload,
+                reasoning={"effort": "high"},
+                text={"verbosity": "low"},
+            )
+            html_content = getattr(response, "output_text", None) or getattr(response, "text", None) or ""
+        except Exception as e:
+            print(f"Responses API not available, falling back to chat completions: {e}")
+            # Fallback to standard chat completions API
+            messages = [
+                {"role": "system", "content": GENERATE_HTML_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": data_url}},
+                        {"type": "text", "text": user_text},
+                    ]
+                }
+            ]
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                max_tokens=4000
+            )
+            html_content = response.choices[0].message.content or ""
 
-        # Extract the response text
-        html_content = getattr(response, "output_text", None) or getattr(response, "text", None) or ""
+        # html_content is already set in the try/except block above
         
         print(f"Received HTML content length: {len(html_content)}")
         
@@ -205,13 +231,17 @@ async def generate_html_from_slide(base64_image: str, media_type: str, xml_conte
             )
 
 
-async def generate_react_component_from_html(html_content: str, api_key: str, image_base64: Optional[str] = None, media_type: Optional[str] = None) -> str:
+async def generate_react_component_from_html(html_content: str, api_key: str, base_url: str, model_name: str, image_base64: Optional[str] = None, media_type: Optional[str] = None) -> str:
     """
-    Convert HTML content to TSX React component using OpenAI GPT-5 Responses API.
+    Convert HTML content to TSX React component using OpenAI compatible API.
     
     Args:
         html_content: Generated HTML content
-        api_key: OpenAI API key
+        api_key: API key
+        base_url: API base URL
+        model_name: Model name to use
+        image_base64: Optional image for context
+        media_type: Optional media type
     
     Returns:
         Generated TSX React component code as string
@@ -220,9 +250,9 @@ async def generate_react_component_from_html(html_content: str, api_key: str, im
         HTTPException: If API call fails or no content is generated
     """
     try:
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, base_url=base_url)
 
-        print("Making Responses API request for React component generation...")
+        print(f"Making API request for React component generation with model {model_name}...")
 
         # Build payload with optional image
         content_parts = [{"type": "input_text", "text": f"HTML INPUT:\n{html_content}"}]
@@ -235,21 +265,40 @@ async def generate_react_component_from_html(html_content: str, api_key: str, im
             {"role": "user", "content": content_parts},
         ]
 
-        response = client.responses.create(
-            model="gpt-5",
-            input=input_payload,
-            reasoning={"effort": "minimal"},
-            text={"verbosity": "low"},
-        )
-
-        react_content = getattr(response, "output_text", None) or getattr(response, "text", None) or ""
+        # Use responses API if available (OpenAI), otherwise use chat completions
+        try:
+            response = client.responses.create(
+                model=model_name,
+                input=input_payload,
+                reasoning={"effort": "minimal"},
+                text={"verbosity": "low"},
+            )
+            react_content = getattr(response, "output_text", None) or getattr(response, "text", None) or ""
+        except Exception as e:
+            print(f"Responses API not available, falling back to chat completions: {e}")
+            # Fallback to standard chat completions API
+            messages = [
+                {"role": "system", "content": HTML_TO_REACT_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": ([{"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{image_base64}"}}] if image_base64 and media_type else []) + [
+                        {"type": "text", "text": f"HTML INPUT:\n{html_content}"}
+                    ]
+                }
+            ]
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                max_tokens=4000
+            )
+            react_content = response.choices[0].message.content or ""
         
         print(f"Received React content length: {len(react_content)}")
         
         if not react_content:
             raise HTTPException(
                 status_code=500,
-                detail="No React component generated by OpenAI GPT-5"
+                detail=f"No React component generated by {model_name}"
             )
         
         react_content = react_content.replace("```tsx", "").replace("```", "").replace("typescript", "").replace("javascript", "")
@@ -294,9 +343,9 @@ async def generate_react_component_from_html(html_content: str, api_key: str, im
             )
 
 
-async def edit_html_with_images(current_ui_base64: str, sketch_base64: Optional[str], media_type: str, html_content: str, prompt: str, api_key: str) -> str:
+async def edit_html_with_images(current_ui_base64: str, sketch_base64: Optional[str], media_type: str, html_content: str, prompt: str, api_key: str, base_url: str, model_name: str) -> str:
     """
-    Edit HTML content based on one or two images and a text prompt using OpenAI GPT-5 Responses API.
+    Edit HTML content based on one or two images and a text prompt using OpenAI compatible API.
 
     Args:
         current_ui_base64: Base64 encoded current UI image data
@@ -304,7 +353,9 @@ async def edit_html_with_images(current_ui_base64: str, sketch_base64: Optional[
         media_type: MIME type of the images (e.g., 'image/png')
         html_content: Current HTML content to edit
         prompt: Text prompt describing the changes
-        api_key: OpenAI API key
+        api_key: API key
+        base_url: API base URL
+        model_name: Model name to use
     
     Returns:
         Edited HTML content as string
@@ -313,9 +364,9 @@ async def edit_html_with_images(current_ui_base64: str, sketch_base64: Optional[
         HTTPException: If API call fails or no content is generated
     """
     try:
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, base_url=base_url)
 
-        print("Making Responses API request for HTML editing...")
+        print(f"Making API request for HTML editing with model {model_name}...")
 
         current_data_url = f"data:{media_type};base64,{current_ui_base64}"
         sketch_data_url = f"data:{media_type};base64,{sketch_base64}" if sketch_base64 else None
@@ -333,14 +384,35 @@ async def edit_html_with_images(current_ui_base64: str, sketch_base64: Optional[
             {"role": "user", "content": content_parts},
         ]
 
-        response = client.responses.create(
-            model="gpt-5",
-            input=input_payload,
-            reasoning={"effort": "low"},
-            text={"verbosity": "low"},
-        )
-
-        edited_html = getattr(response, "output_text", None) or getattr(response, "text", None) or ""
+        # Use responses API if available (OpenAI), otherwise use chat completions
+        try:
+            response = client.responses.create(
+                model=model_name,
+                input=input_payload,
+                reasoning={"effort": "low"},
+                text={"verbosity": "low"},
+            )
+            edited_html = getattr(response, "output_text", None) or getattr(response, "text", None) or ""
+        except Exception as e:
+            print(f"Responses API not available, falling back to chat completions: {e}")
+            # Fallback to standard chat completions API
+            messages = [
+                {"role": "system", "content": HTML_EDIT_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": current_data_url}}
+                    ] + ([{"type": "image_url", "image_url": {"url": sketch_data_url}}] if sketch_data_url else []) + [
+                        {"type": "text", "text": f"CURRENT HTML TO EDIT:\n{html_content}\n\nTEXT PROMPT FOR CHANGES:\n{prompt}"}
+                    ]
+                }
+            ]
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                max_tokens=4000
+            )
+            edited_html = response.choices[0].message.content or ""
         
         print(f"Received edited HTML content length: {len(edited_html)}")
         
@@ -384,7 +456,7 @@ async def edit_html_with_images(current_ui_base64: str, sketch_base64: Optional[
 @SLIDE_TO_HTML_ROUTER.post("/", response_model=SlideToHtmlResponse)
 async def convert_slide_to_html(request: SlideToHtmlRequest):
     """
-    Convert a slide image and its OXML data to HTML using Anthropic Claude API.
+    Convert a slide image and its OXML data to HTML using OpenAI compatible API.
     
     Args:
         request: JSON request containing image path and XML content
@@ -393,12 +465,26 @@ async def convert_slide_to_html(request: SlideToHtmlRequest):
         SlideToHtmlResponse with generated HTML
     """
     try:
-        # Get OpenAI API key from environment
-        api_key = os.getenv("OPENAI_API_KEY")
+        # Get user configuration for dynamic API settings
+        user_config = get_user_config()
+        
+        # Determine API key and URL based on LLM provider
+        llm_provider = user_config.LLM or get_llm_provider_env()
+        
+        if llm_provider == "custom":
+            api_key = user_config.CUSTOM_LLM_API_KEY
+            base_url = user_config.CUSTOM_LLM_URL
+            model_name = user_config.CUSTOM_MODEL or "gpt-4o"
+        else:
+            # Default to OpenAI settings
+            api_key = user_config.OPENAI_API_KEY or get_openai_api_key_env()
+            base_url = user_config.OPENAI_URL or get_openai_url_env() or "https://api.openai.com/v1"
+            model_name = user_config.OPENAI_MODEL or get_openai_model_env() or "gpt-4o"
+        
         if not api_key:
             raise HTTPException(
                 status_code=500, 
-                detail="OPENAI_API_KEY environment variable not set"
+                detail=f"API key not set for LLM provider: {llm_provider}"
             )
         
         # Resolve image path to actual file system path
@@ -449,6 +535,8 @@ async def convert_slide_to_html(request: SlideToHtmlRequest):
             media_type=media_type,
             xml_content=request.xml,
             api_key=api_key,
+            base_url=base_url,
+            model_name=model_name,
             fonts=request.fonts,
             )
         
@@ -475,7 +563,7 @@ async def convert_slide_to_html(request: SlideToHtmlRequest):
 @HTML_TO_REACT_ROUTER.post("/", response_model=HtmlToReactResponse)
 async def convert_html_to_react(request: HtmlToReactRequest):
     """
-    Convert HTML content to TSX React component using Anthropic Claude API.
+    Convert HTML content to TSX React component using OpenAI compatible API.
     
     Args:
         request: JSON request containing HTML content
@@ -484,12 +572,26 @@ async def convert_html_to_react(request: HtmlToReactRequest):
         HtmlToReactResponse with generated React component
     """
     try:
-        # Get OpenAI API key from environment
-        api_key = os.getenv("OPENAI_API_KEY")
+        # Get user configuration for dynamic API settings
+        user_config = get_user_config()
+        
+        # Determine API key and URL based on LLM provider
+        llm_provider = user_config.LLM or get_llm_provider_env()
+        
+        if llm_provider == "custom":
+            api_key = user_config.CUSTOM_LLM_API_KEY
+            base_url = user_config.CUSTOM_LLM_URL
+            model_name = user_config.CUSTOM_MODEL or "gpt-4o"
+        else:
+            # Default to OpenAI settings
+            api_key = user_config.OPENAI_API_KEY or get_openai_api_key_env()
+            base_url = user_config.OPENAI_URL or get_openai_url_env() or "https://api.openai.com/v1"
+            model_name = user_config.OPENAI_MODEL or get_openai_model_env() or "gpt-4o"
+        
         if not api_key:
             raise HTTPException(
                 status_code=500, 
-                detail="OPENAI_API_KEY environment variable not set"
+                detail=f"API key not set for LLM provider: {llm_provider}"
             )
         
         # Validate HTML content
@@ -522,6 +624,8 @@ async def convert_html_to_react(request: HtmlToReactRequest):
         react_component = await generate_react_component_from_html(
             html_content=request.html,
             api_key=api_key,
+            base_url=base_url,
+            model_name=model_name,
             image_base64=image_b64,
             media_type=media_type
         )
@@ -555,7 +659,7 @@ async def edit_html_with_images_endpoint(
     prompt: str = Form(..., description="Text prompt describing the changes")
 ):
     """
-    Edit HTML content based on one or two uploaded images and a text prompt using Anthropic Claude API.
+    Edit HTML content based on one or two uploaded images and a text prompt using OpenAI compatible API.
     
     Args:
         current_ui_image: Uploaded current UI image file
@@ -567,12 +671,26 @@ async def edit_html_with_images_endpoint(
         HtmlEditResponse with edited HTML
     """
     try:
-        # Get OpenAI API key from environment
-        api_key = os.getenv("OPENAI_API_KEY")
+        # Get user configuration for dynamic API settings
+        user_config = get_user_config()
+        
+        # Determine API key and URL based on LLM provider
+        llm_provider = user_config.LLM or get_llm_provider_env()
+        
+        if llm_provider == "custom":
+            api_key = user_config.CUSTOM_LLM_API_KEY
+            base_url = user_config.CUSTOM_LLM_URL
+            model_name = user_config.CUSTOM_MODEL or "gpt-4o"
+        else:
+            # Default to OpenAI settings
+            api_key = user_config.OPENAI_API_KEY or get_openai_api_key_env()
+            base_url = user_config.OPENAI_URL or get_openai_url_env() or "https://api.openai.com/v1"
+            model_name = user_config.OPENAI_MODEL or get_openai_model_env() or "gpt-4o"
+        
         if not api_key:
             raise HTTPException(
                 status_code=500, 
-                detail="OPENAI_API_KEY environment variable not set"
+                detail=f"API key not set for LLM provider: {llm_provider}"
             )
         
         # Validate inputs
@@ -622,7 +740,9 @@ async def edit_html_with_images_endpoint(
             media_type=media_type,
             html_content=html,
             prompt=prompt,
-            api_key=api_key
+            api_key=api_key,
+            base_url=base_url,
+            model_name=model_name
         )
 
         edited_html = edited_html.replace("```html", "").replace("```", "")
