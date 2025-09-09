@@ -37,9 +37,10 @@ Convert given static HTML and Tailwind slide to a TSX React component so that it
 6) In schema max and min value for characters in string and items in array should be specified as per the given image of the slide. You should accurately evaluate the maximum and minimum possible characters respective fields can handle visually through the image. ALso give out maximum number of words it can handle in the meta.
 7) For image and icons schema should be compulsorily declared with two dunder fields for prompt and url separately.
 8) Component name at the end should always yo 'dynamicSlideLayout'.
-9) **Import or export statements should not be present in the output.**
-    - Don't give "import {React} from 'react'"
-    - Don't give "import {z} from 'zod'"
+9) **Do NOT include export or import statements:**
+    - Do NOT add "export default dynamicSlideLayout;" at the end  
+    - Do NOT add "export { Schema };" at the end
+    - Do NOT add import statements like "import {React} from 'react'" or "import {z} from 'zod'"
 10) Always use double quotes for strings.
 11) Layout Id, layout name and layout description should be declared and should describe the structure of the layout not its purpose. Do not describe numbers of any items in the layout.
     -layoutDescription should not have any purpose for elements in it, so use '...cards' instead of '...goal cards' and '...bullet points' instead of '...solution bullet points'.
@@ -53,7 +54,17 @@ Convert given static HTML and Tailwind slide to a TSX React component so that it
 14. Always complete the reference, do not give "slideData .? .cards" instead give "slideData?.cards".
 15. Do not add anything other than code. Do not add "use client", "json", "typescript", "javascript" and other prefix or suffix, just give out code exactly formatted like example.
 16. In schema, give default for all fields irrespective of their types, give defualt values for array and objects as well. 
-17. For charts use recharts.js library and follow these rules strictly:
+17. **IMPORTANT - Schema Field Types:** Use the correct Zod types for each field:
+    - **All text content fields (title, subtitle, description, text, content, etc.) MUST use z.string()** 
+    - Do NOT use z.object() for text fields - this causes validation errors
+    - Only use z.object() for complex nested structures like ImageSchema or IconSchema
+    - Example correct text field: `title: z.string().min(3).max(40).default("Sample Title")`
+    - Example WRONG text field: `title: z.object({...}).default("Sample Title")`
+18. **IMPORTANT - Zod Method Chaining Order:** Always use correct method chaining order:
+    - Correct: `z.string().min(3).max(40).default("text").meta({...})`
+    - WRONG: `z.string().default("text").meta({...}).min(3)` (causes compilation errors)
+    - Rule: .min(), .max(), .default() MUST come before .meta() 
+19. For charts use recharts.js library and follow these rules strictly:
     - Do not import rechart, it will already be imported.
     - There should support for multiple chart types including bar, line, pie and donut in the same size as given. 
     - Use an attribute in the schema to select between chart types.

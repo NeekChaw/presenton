@@ -75,7 +75,8 @@ services:
     ports:
       - "5000:80"
     volumes:
-      - .:/app
+      - ./servers/fastapi:/app/servers/fastapi
+      - ./.env:/app/.env
       - ./app_data:/app_data
     environment:
       - CAN_CHANGE_KEYS=${CAN_CHANGE_KEYS}

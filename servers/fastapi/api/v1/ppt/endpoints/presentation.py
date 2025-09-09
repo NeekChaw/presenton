@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import random
+import uuid
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -9,6 +10,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 from models.generate_presentation_request import GeneratePresentationRequest
+from models.create_presentation_request import CreatePresentationRequest
 from models.presentation_and_path import PresentationPathAndEditPath
 from models.presentation_from_template import GetPresentationUsingTemplateRequest
 from models.presentation_outline_model import (
@@ -109,26 +111,20 @@ async def get_all_presentations(sql_session: AsyncSession = Depends(get_async_se
 
 @PRESENTATION_ROUTER.post("/create", response_model=PresentationModel)
 async def create_presentation(
-    content: Annotated[str, Body()],
-    n_slides: Annotated[int, Body()],
-    language: Annotated[str, Body()],
-    file_paths: Annotated[Optional[List[str]], Body()] = None,
-    tone: Annotated[Optional[str], Body()] = None,
-    verbosity: Annotated[Optional[str], Body()] = None,
-    instructions: Annotated[Optional[str], Body()] = None,
+    request: CreatePresentationRequest,
     sql_session: AsyncSession = Depends(get_async_session),
 ):
     presentation_id = uuid.uuid4()
 
     presentation = PresentationModel(
         id=presentation_id,
-        content=content,
-        n_slides=n_slides,
-        language=language,
-        file_paths=file_paths,
-        tone=tone,
-        verbosity=verbosity,
-        instructions=instructions,
+        content=request.content,
+        n_slides=request.n_slides,
+        language=request.language,
+        file_paths=request.file_paths,
+        tone=request.tone,
+        verbosity=request.verbosity,
+        instructions=request.instructions,
     )
 
     sql_session.add(presentation)
