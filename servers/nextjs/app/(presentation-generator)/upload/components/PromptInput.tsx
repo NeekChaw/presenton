@@ -1,5 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { useState } from "react";
 
 

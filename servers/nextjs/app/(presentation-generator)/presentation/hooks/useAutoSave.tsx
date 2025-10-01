@@ -46,7 +46,13 @@ export const useAutoSave = ({
                 console.log('🔄 Auto-saving presentation data...');
 
                 // Call the API to update presentation content
-                await PresentationGenerationApi.updatePresentationContent(data);
+                // Only send the fields the backend expects
+                const updatePayload = {
+                    id: data.id,
+                    slides: data.slides
+                };
+                console.log('Auto-save payload:', updatePayload);
+                await PresentationGenerationApi.updatePresentationContent(updatePayload);
 
                 // Update last saved data reference
                 lastSavedDataRef.current = currentDataString;
@@ -55,6 +61,13 @@ export const useAutoSave = ({
 
             } catch (error) {
                 console.error('❌ Auto-save failed:', error);
+
+                // Additional debugging info
+                if (error instanceof Error) {
+                    console.error('Error name:', error.name);
+                    console.error('Error message:', error.message);
+                    console.error('Error stack:', error.stack);
+                }
 
             } finally {
                 setIsSaving(false);

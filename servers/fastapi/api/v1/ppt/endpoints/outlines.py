@@ -4,6 +4,8 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from openai import APIConnectionError, APITimeoutError
+import httpx
 
 from models.presentation_outline_model import PresentationOutlineModel
 from models.sql.presentation import PresentationModel
@@ -62,36 +64,82 @@ async def stream_outlines(
 
         if not presentation_outlines:
             presentation_outlines_text = ""
-            async for chunk in generate_ppt_outline(
-                presentation.content,
-                presentation.n_slides,
-                presentation.language,
-                additional_context,
-                presentation.tone,
-                presentation.verbosity,
-                presentation.instructions,
-                True,
-            ):
-                # Give control to the event loop
-                await asyncio.sleep(0)
+            max_retries = 3
+            retry_delay = 2
 
-                if isinstance(chunk, HTTPException):
-                    yield SSEErrorResponse(detail=chunk.detail).to_string()
+            for attempt in range(max_retries):
+                try:
+                    async for chunk in generate_ppt_outline(
+                        presentation.content,
+                        presentation.n_slides,
+                        presentation.language,
+                        additional_context,
+                        presentation.tone,
+                        presentation.verbosity,
+                        presentation.instructions,
+                        True,
+                    ):
+                        # Give control to the event loop
+                        await asyncio.sleep(0)
+
+                        if isinstance(chunk, HTTPException):
+                            yield SSEErrorResponse(detail=chunk.detail).to_string()
+                            return
+
+                        yield SSEResponse(
+                            event="response",
+                            data=json.dumps({"type": "chunk", "chunk": chunk}),
+                        ).to_string()
+
+                        presentation_outlines_text += chunk
+
+                    # If we get here, generation was successful
+                    break
+
+                except (APIConnectionError, APITimeoutError, httpx.ConnectError, httpx.TimeoutException) as e:
+                    print(f"Connection attempt {attempt + 1}/{max_retries} failed: {str(e)}")
+                    if attempt == max_retries - 1:
+                        yield SSEErrorResponse(
+                            detail=f"Failed to connect to the server after {max_retries} attempts. Please try again later."
+                        ).to_string()
+                        return
+
+                    # Exponential backoff with status update
+                    yield SSEStatusResponse(
+                        status=f"Connection attempt {attempt + 1} failed, retrying in {retry_delay}s..."
+                    ).to_string()
+
+                    await asyncio.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+
+                except Exception as e:
+                    print(f"Unexpected error during presentation generation: {str(e)}")
+                    yield SSEErrorResponse(
+                        detail=f"An unexpected error occurred: {str(e)}"
+                    ).to_string()
                     return
 
-                yield SSEResponse(
-                    event="response",
-                    data=json.dumps({"type": "chunk", "chunk": chunk}),
-                ).to_string()
-
-                presentation_outlines_text += chunk
-
             try:
+                print(f"Trying to parse JSON (length: {len(presentation_outlines_text)}): {presentation_outlines_text[:500]}...")
+                if not presentation_outlines_text.strip():
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Empty response from LLM. Please try again."
+                    )
                 presentation_outlines_json = json.loads(presentation_outlines_text)
-            except Exception as e:
+            except json.JSONDecodeError as e:
+                print(f"JSON parsing error: {str(e)}")
+                print(f"Raw response: {presentation_outlines_text}")
                 raise HTTPException(
                     status_code=400,
-                    detail="Failed to generate presentation outlines. Please try again.",
+                    detail=f"Failed to parse LLM response as JSON: {str(e)}. Raw response length: {len(presentation_outlines_text)}",
+                )
+            except Exception as e:
+                print(f"Unexpected error during outline generation: {str(e)}")
+                print(f"Raw response: {presentation_outlines_text}")
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Failed to generate presentation outlines: {str(e)}",
                 )
 
             presentation_outlines = PresentationOutlineModel(

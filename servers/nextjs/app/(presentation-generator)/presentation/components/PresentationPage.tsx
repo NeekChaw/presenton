@@ -1,6 +1,6 @@
 "use client";
 import React, {  useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -67,6 +67,7 @@ const PresentationPage: React.FC<PresentationPageProps> = ({
     setSelectedSlide,
     setIsFullscreen
   );
+
 
   // Initialize streaming
   usePresentationStreaming(

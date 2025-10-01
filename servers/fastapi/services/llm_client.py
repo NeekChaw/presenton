@@ -2,6 +2,7 @@ import asyncio
 import json
 from typing import AsyncGenerator, List, Optional
 from fastapi import HTTPException
+import httpx
 from openai import AsyncOpenAI
 from openai.types.chat.chat_completion_chunk import (
     ChatCompletionChunk as OpenAIChatCompletionChunk,
@@ -112,8 +113,17 @@ class LLMClient:
                 status_code=400,
                 detail="OpenAI API Key is not set",
             )
+        # Configure HTTP client with retry and timeout
+        http_client = httpx.AsyncClient(
+            timeout=httpx.Timeout(60.0, connect=10.0),
+            limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+            transport=httpx.AsyncHTTPTransport(retries=3)
+        )
+
         return AsyncOpenAI(
             base_url=get_openai_url_env(),
+            http_client=http_client,
+            timeout=60.0
         )
 
     def _get_google_client(self):
@@ -133,9 +143,18 @@ class LLMClient:
         return AsyncAnthropic()
 
     def _get_ollama_client(self):
+        # Configure HTTP client with retry and timeout
+        http_client = httpx.AsyncClient(
+            timeout=httpx.Timeout(60.0, connect=10.0),
+            limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+            transport=httpx.AsyncHTTPTransport(retries=3)
+        )
+
         return AsyncOpenAI(
             base_url=(get_ollama_url_env() or "http://localhost:11434") + "/v1",
             api_key="ollama",
+            http_client=http_client,
+            timeout=60.0
         )
 
     def _get_custom_client(self):
@@ -144,9 +163,18 @@ class LLMClient:
                 status_code=400,
                 detail="Custom LLM URL is not set",
             )
+        # Configure HTTP client with retry and timeout for better connection stability
+        http_client = httpx.AsyncClient(
+            timeout=httpx.Timeout(60.0, connect=10.0),
+            limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+            transport=httpx.AsyncHTTPTransport(retries=3)
+        )
+
         return AsyncOpenAI(
             base_url=get_custom_llm_url_env(),
             api_key=get_custom_llm_api_key_env() or "null",
+            http_client=http_client,
+            timeout=60.0
         )
 
     # ? Prompts
@@ -557,7 +585,12 @@ class LLMClient:
                 )
         if content:
             if depth == 0:
-                return json.loads(content)
+                try:
+                    return json.loads(content)
+                except json.JSONDecodeError as e:
+                    print(f"JSON decode error in LLMClient: {e}")
+                    print(f"Content: {content[:500]!r}")
+                    raise
             return content
         return None
 
@@ -658,7 +691,12 @@ class LLMClient:
             )
 
         if text_content:
-            return json.loads(text_content)
+            try:
+                return json.loads(text_content)
+            except json.JSONDecodeError as e:
+                print(f"JSON decode error in Google structured generation: {e}")
+                print(f"Content: {text_content[:500]!r}")
+                raise
         return None
 
     async def _generate_anthropic_structured(

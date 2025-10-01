@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 import os
+from pathlib import Path
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     create_async_engine,
@@ -16,6 +17,7 @@ from models.sql.slide import SlideModel
 from models.sql.presentation_layout_code import PresentationLayoutCodeModel
 from models.sql.template import TemplateModel
 from utils.db_utils import get_database_url_and_connect_args
+from utils.get_env import get_app_data_directory_env
 
 
 database_url, connect_args = get_database_url_and_connect_args()
@@ -30,7 +32,13 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 # Container DB (Lives inside the container)
-container_db_url = "sqlite+aiosqlite:////app/container.db"
+container_db_path = os.getenv("CONTAINER_DB_PATH")
+if not container_db_path:
+    base_dir = get_app_data_directory_env() or os.path.join(os.getcwd(), "app_data")
+    container_db_path = os.path.join(base_dir, "container.db")
+container_db_path = Path(container_db_path)
+container_db_path.parent.mkdir(parents=True, exist_ok=True)
+container_db_url = f"sqlite+aiosqlite:///{container_db_path.as_posix()}"
 container_db_engine: AsyncEngine = create_async_engine(
     container_db_url, connect_args={"check_same_thread": False}
 )

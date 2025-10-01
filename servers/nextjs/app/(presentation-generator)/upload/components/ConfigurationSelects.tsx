@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/temporary-translations';
 import { LanguageType, PresentationConfig } from "../type";
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";

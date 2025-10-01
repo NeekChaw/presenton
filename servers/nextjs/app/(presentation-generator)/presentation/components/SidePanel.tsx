@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { LayoutList, ListTree, PanelRightOpen, X } from "lucide-react";
 import ToolTip from "@/components/ToolTip";
 import { Button } from "@/components/ui/button";

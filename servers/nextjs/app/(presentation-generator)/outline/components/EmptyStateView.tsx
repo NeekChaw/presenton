@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { Button } from "@/components/ui/button";
 import Wrapper from "@/components/Wrapper";
 import { FileText, Plus, ArrowRight } from "lucide-react";

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Layout, Plus } from "lucide-react";
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations, useLocale } from '@/lib/temporary-translations';
 import { usePathname, useRouter } from "next/navigation";
 
 const Header: React.FC = () => {

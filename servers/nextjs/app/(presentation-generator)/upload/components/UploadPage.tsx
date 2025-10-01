@@ -11,7 +11,7 @@
 
 "use client";
 import React, { useState } from "react";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/temporary-translations';
 import { useRouter, usePathname } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { clearOutlines, setPresentationId } from "@/store/slices/presentationGeneration";

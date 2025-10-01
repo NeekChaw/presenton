@@ -37,7 +37,7 @@ import { usePresentationUndoRedo } from "../hooks/PresentationUndoRedo";
 import ToolTip from "@/components/ToolTip";
 import { clearPresentationData } from "@/store/slices/presentationGeneration";
 import { clearHistory } from "@/store/slices/undoRedoSlice";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 
 const Header = ({
   presentation_id,

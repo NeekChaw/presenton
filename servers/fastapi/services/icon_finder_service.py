@@ -24,7 +24,7 @@ class IconFinderService:
                 self.collection_name, embedding_function=self.embedding_function
             )
         except Exception:
-            with open("assets/icons.json", "r") as f:
+            with open("assets/icons.json", "r", encoding="utf-8") as f:
                 icons = json.load(f)
 
             documents = []

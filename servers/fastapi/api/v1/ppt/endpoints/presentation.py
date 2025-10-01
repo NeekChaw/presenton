@@ -67,9 +67,14 @@ async def get_presentation(
         .where(SlideModel.presentation == id)
         .order_by(SlideModel.index)
     )
+    # Convert SQLAlchemy objects to Pydantic models and add required user field
+    presentation_data = presentation.model_dump()
+    presentation_data["user"] = uuid.uuid4()  # Add default user UUID
+    slides_data = [slide.model_dump() for slide in slides]
+
     return PresentationWithSlides(
-        **presentation.model_dump(),
-        slides=slides,
+        **presentation_data,
+        slides=slides_data,
     )
 
 
@@ -87,26 +92,32 @@ async def delete_presentation(
 
 @PRESENTATION_ROUTER.get("/all", response_model=List[PresentationWithSlides])
 async def get_all_presentations(sql_session: AsyncSession = Depends(get_async_session)):
-    presentations_with_slides = []
-    presentations = await sql_session.scalars(select(PresentationModel))
+    try:
+        presentations = await sql_session.scalars(select(PresentationModel))
+        presentations_with_slides = []
 
-    async def inner(presentation: PresentationModel, sql_session: AsyncSession):
-        first_slide = await sql_session.scalar(
-            select(SlideModel)
-            .where(SlideModel.presentation == presentation.id)
-            .where(SlideModel.index == 0)
-        )
-        if not first_slide:
-            return None
-        return PresentationWithSlides(
-            **presentation.model_dump(),
-            slides=[first_slide],
-        )
+        for presentation in presentations:
+            first_slide = await sql_session.scalar(
+                select(SlideModel)
+                .where(SlideModel.presentation == presentation.id)
+                .where(SlideModel.index == 0)
+            )
+            if first_slide:
+                # Convert SQLAlchemy objects to Pydantic models and add required user field
+                presentation_data = presentation.model_dump()
+                presentation_data["user"] = uuid.uuid4()  # Add default user UUID
+                presentation_with_slides = PresentationWithSlides(
+                    **presentation_data,
+                    slides=[first_slide.model_dump()],
+                )
+                presentations_with_slides.append(presentation_with_slides)
 
-    tasks = [inner(p, sql_session) for p in presentations]
-    results = await asyncio.gather(*tasks)
-    presentations_with_slides = [r for r in results if r is not None]
-    return presentations_with_slides
+        return presentations_with_slides
+    except Exception as e:
+        print(f"Error in get_all_presentations: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
 @PRESENTATION_ROUTER.post("/create", response_model=PresentationModel)
@@ -187,15 +198,23 @@ async def prepare_presentation(
 async def stream_presentation(
     presentation_id: uuid.UUID, sql_session: AsyncSession = Depends(get_async_session)
 ):
+    print(f"Starting stream for presentation ID: {presentation_id}")
     presentation = await sql_session.get(PresentationModel, presentation_id)
     if not presentation:
+        print(f"Presentation not found: {presentation_id}")
         raise HTTPException(status_code=404, detail="Presentation not found")
+
+    print(f"Presentation found. Structure exists: {bool(presentation.structure)}")
+    print(f"Outlines exist: {bool(presentation.outlines)}")
+
     if not presentation.structure:
+        print("ERROR: Presentation not prepared for stream - no structure")
         raise HTTPException(
             status_code=400,
             detail="Presentation not prepared for stream",
         )
     if not presentation.outlines:
+        print("ERROR: Outlines can not be empty")
         raise HTTPException(
             status_code=400,
             detail="Outlines can not be empty",
@@ -204,87 +223,114 @@ async def stream_presentation(
     image_generation_service = ImageGenerationService(get_images_directory())
 
     async def inner():
-        structure = presentation.get_structure()
-        layout = presentation.get_layout()
-        outline = presentation.get_presentation_outline()
+        print("Starting inner() generator function")
+        try:
+            structure = presentation.get_structure()
+            layout = presentation.get_layout()
+            outline = presentation.get_presentation_outline()
 
-        # These tasks will be gathered and awaited after all slides are generated
-        async_assets_generation_tasks = []
+            print(f"Structure loaded with {len(structure.slides)} slides")
+            print(f"Layout: {layout.name}")
+            print(f"Outline has {len(outline.slides)} slides")
 
-        slides: List[SlideModel] = []
-        yield SSEResponse(
-            event="response",
-            data=json.dumps({"type": "chunk", "chunk": '{ "slides": [ '}),
-        ).to_string()
-        for i, slide_layout_index in enumerate(structure.slides):
-            slide_layout = layout.slides[slide_layout_index]
+            # These tasks will be gathered and awaited after all slides are generated
+            async_assets_generation_tasks = []
 
-            try:
-                slide_content = await get_slide_content_from_type_and_outline(
-                    slide_layout,
-                    outline.slides[i],
-                    presentation.language,
-                    presentation.tone,
-                    presentation.verbosity,
-                    presentation.instructions,
+            slides: List[SlideModel] = []
+            print("Yielding initial chunk")
+            yield SSEResponse(
+                event="response",
+                data=json.dumps({"type": "chunk", "chunk": '{ "slides": [ '}),
+            ).to_string()
+            for i, slide_layout_index in enumerate(structure.slides):
+                print(f"Processing slide {i+1}/{len(structure.slides)}")
+                slide_layout = layout.slides[slide_layout_index]
+
+                try:
+                    print(f"Generating content for slide {i+1}")
+                    slide_content = await get_slide_content_from_type_and_outline(
+                        slide_layout,
+                        outline.slides[i],
+                        presentation.language,
+                        presentation.tone,
+                        presentation.verbosity,
+                        presentation.instructions,
+                    )
+                    print(f"Content generated for slide {i+1}")
+                except HTTPException as e:
+                    print(f"HTTPException while generating slide {i+1}: {e.detail}")
+                    yield SSEErrorResponse(detail=e.detail).to_string()
+                    return
+                except Exception as e:
+                    print(f"Unexpected error while generating slide {i+1}: {e}")
+                    yield SSEErrorResponse(detail=f"Error generating slide {i+1}: {str(e)}").to_string()
+                    return
+
+                slide = SlideModel(
+                    presentation=presentation_id,
+                    layout_group=layout.name,
+                    layout=slide_layout.id,
+                    index=i,
+                    speaker_note=slide_content.get("__speaker_note__", ""),
+                    content=slide_content,
                 )
-            except HTTPException as e:
-                yield SSEErrorResponse(detail=e.detail).to_string()
-                return
+                slides.append(slide)
 
-            slide = SlideModel(
-                presentation=presentation_id,
-                layout_group=layout.name,
-                layout=slide_layout.id,
-                index=i,
-                speaker_note=slide_content.get("__speaker_note__", ""),
-                content=slide_content,
-            )
-            slides.append(slide)
+                # This will mutate slide and add placeholder assets
+                process_slide_add_placeholder_assets(slide)
 
-            # This will mutate slide and add placeholder assets
-            process_slide_add_placeholder_assets(slide)
+                # This will mutate slide
+                async_assets_generation_tasks.append(
+                    process_slide_and_fetch_assets(image_generation_service, slide)
+                )
 
-            # This will mutate slide
-            async_assets_generation_tasks.append(
-                process_slide_and_fetch_assets(image_generation_service, slide)
-            )
+                yield SSEResponse(
+                    event="response",
+                    data=json.dumps({"type": "chunk", "chunk": slide.model_dump_json()}),
+                ).to_string()
 
             yield SSEResponse(
                 event="response",
-                data=json.dumps({"type": "chunk", "chunk": slide.model_dump_json()}),
+                data=json.dumps({"type": "chunk", "chunk": " ] }"}),
             ).to_string()
+            print("Finished sending final chunk")
 
-        yield SSEResponse(
-            event="response",
-            data=json.dumps({"type": "chunk", "chunk": " ] }"}),
-        ).to_string()
+            # Save slides to database immediately
+            await sql_session.execute(
+                delete(SlideModel).where(SlideModel.presentation == presentation_id)
+            )
+            sql_session.add(presentation)
+            sql_session.add_all(slides)
+            await sql_session.commit()
+            print("Slides saved to database")
 
-        generated_assets_lists = await asyncio.gather(*async_assets_generation_tasks)
-        generated_assets = []
-        for assets_list in generated_assets_lists:
-            generated_assets.extend(assets_list)
+            # Create response and send completion event
+            presentation_data = presentation.model_dump()
+            # Add default user UUID since PresentationModel doesn't have user field but PresentationWithSlides requires it
+            presentation_data["user"] = uuid.uuid4()  # Use a default UUID for now
 
-        # Moved this here to make sure new slides are generated before deleting the old ones
-        await sql_session.execute(
-            delete(SlideModel).where(SlideModel.presentation == presentation_id)
-        )
-        await sql_session.commit()
+            # Convert SQLAlchemy objects to Pydantic models
+            slides_data = [slide.model_dump() for slide in slides]
 
-        sql_session.add(presentation)
-        sql_session.add_all(slides)
-        sql_session.add_all(generated_assets)
-        await sql_session.commit()
+            response = PresentationWithSlides(
+                **presentation_data,
+                slides=slides_data,
+            )
+            print("About to send complete event...")
 
-        response = PresentationWithSlides(
-            **presentation.model_dump(),
-            slides=slides,
-        )
+            yield SSECompleteResponse(
+                key="presentation",
+                value=response.model_dump(mode="json"),
+            ).to_string()
+            print("Complete event sent successfully")
 
-        yield SSECompleteResponse(
-            key="presentation",
-            value=response.model_dump(mode="json"),
-        ).to_string()
+            print("Generator function completed")
+
+        except Exception as e:
+            print(f"Error in inner() generator: {e}")
+            import traceback
+            traceback.print_exc()
+            yield SSEErrorResponse(detail=f"Internal error: {str(e)}").to_string()
 
     return StreamingResponse(inner(), media_type="text/event-stream")
 
@@ -323,9 +369,14 @@ async def update_presentation(
 
     await sql_session.commit()
 
+    # Convert SQLAlchemy objects to Pydantic models and add required user field
+    presentation_data = presentation.model_dump()
+    presentation_data["user"] = uuid.uuid4()  # Add default user UUID
+    slides_data = [slide.model_dump() for slide in slides] if slides else []
+
     return PresentationWithSlides(
-        **presentation.model_dump(),
-        slides=slides or [],
+        **presentation_data,
+        slides=slides_data,
     )
 
 
@@ -396,12 +447,27 @@ async def generate_presentation_api(
             presentation_outlines_text += chunk
 
         try:
+            print(f"Attempting to parse presentation_outlines_text (length: {len(presentation_outlines_text)})")
+            print(f"First 500 chars: {presentation_outlines_text[:500]!r}")
+            if not presentation_outlines_text.strip():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Empty response from LLM. Please try again."
+                )
             presentation_outlines_json = json.loads(presentation_outlines_text)
-        except Exception as e:
-            print(e)
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error: {str(e)}")
+            print(f"Raw response: {presentation_outlines_text!r}")
             raise HTTPException(
                 status_code=400,
-                detail="Failed to generate presentation outlines. Please try again.",
+                detail=f"Failed to parse LLM response as JSON: {str(e)}. Raw response length: {len(presentation_outlines_text)}"
+            )
+        except Exception as e:
+            print(f"Unexpected error during presentation generation: {str(e)}")
+            print(f"Raw response: {presentation_outlines_text!r}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to generate presentation outlines: {str(e)}"
             )
         presentation_outlines = PresentationOutlineModel(**presentation_outlines_json)
 

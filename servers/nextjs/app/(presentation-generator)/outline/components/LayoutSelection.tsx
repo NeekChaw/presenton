@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { useLayout } from "../../context/LayoutContext";
 import GroupLayouts from "./GroupLayouts";
 

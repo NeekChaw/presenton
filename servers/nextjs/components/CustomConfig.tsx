@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/temporary-translations';
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -167,9 +167,7 @@ export default function CustomConfig({
         <div className="mb-4">
           <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <p className="text-sm text-amber-800">
-              <strong>{t.rich('importantNote', {
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}</strong>
+              <strong>{t('importantNote')}</strong>
             </p>
           </div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

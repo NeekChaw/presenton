@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 
 import { Card } from "@/components/ui/card";
 import { DashboardApi } from "@/app/(presentation-generator)/services/api/dashboard";

@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 import MixpanelInitializer from "./MixpanelInitializer";
 import { LayoutProvider } from "./(presentation-generator)/context/LayoutContext";
 import { Toaster } from "@/components/ui/sonner";
-import {NextIntlClientProvider} from 'next-intl';
-import {getMessages} from 'next-intl/server';
+// import {NextIntlClientProvider} from 'next-intl';
+// import {getMessages} from 'next-intl/server';
 
 const inter = localFont({
   src: [
@@ -79,18 +79,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  params: {locale}
+  params
 }: Readonly<{
   children: React.ReactNode;
-  params: {locale: string};
+  params?: {locale?: string};
 }>) {
+  const locale = params?.locale || 'en';
 
   return (
     <html lang={locale}>
       <body
         className={`${inter.variable} ${roboto.variable} ${instrument_sans.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={getMessages()}>
           <Providers>
             <MixpanelInitializer>
               <LayoutProvider>
@@ -98,7 +98,6 @@ export default function RootLayout({
               </LayoutProvider>
             </MixpanelInitializer>
           </Providers>
-        </NextIntlClientProvider>
         <Toaster position="top-center" />
       </body>
     </html>

@@ -1,15 +1,22 @@
 
+// import createNextIntlPlugin from 'next-intl/plugin';
+// const withNextIntl = createNextIntlPlugin('./i18n.ts');
+
 const nextConfig = {
   reactStrictMode: false,
   distDir: ".next-build",
   
 
-  // Rewrites for development - proxy font requests to FastAPI backend
+  // Rewrites for development - proxy requests to FastAPI backend
   async rewrites() {
     return [
       {
         source: '/app_data/fonts/:path*',
         destination: 'http://localhost:8000/app_data/fonts/:path*',
+      },
+      {
+        source: '/api/v1/:path*',
+        destination: 'http://localhost:8000/api/v1/:path*',
       },
     ];
   },

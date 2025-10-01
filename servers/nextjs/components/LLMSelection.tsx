@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/lib/temporary-translations';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { Check, ChevronsUpDown, Info } from "lucide-react";
 import { Button } from "./ui/button";
@@ -310,13 +310,17 @@ export default function LLMProviderSelection({
                         ? llmConfig.PEXELS_API_KEY || ""
                         : provider.apiKeyField === "PIXABAY_API_KEY"
                           ? llmConfig.PIXABAY_API_KEY || ""
-                          : ""
+                          : provider.apiKeyField === "GOOGLE_API_KEY"
+                            ? llmConfig.GOOGLE_API_KEY || ""
+                            : ""
                     }
                     onChange={(e) => {
                       if (provider.apiKeyField === "PEXELS_API_KEY") {
                         input_field_changed(e.target.value, "pexels_api_key");
                       } else if (provider.apiKeyField === "PIXABAY_API_KEY") {
                         input_field_changed(e.target.value, "pixabay_api_key");
+                      } else if (provider.apiKeyField === "GOOGLE_API_KEY") {
+                        input_field_changed(e.target.value, "google_api_key");
                       }
                     }}
                   />

@@ -111,7 +111,7 @@ export class PresentationGenerationApi {
   static async updatePresentationContent(body: any) {
     try {
       const response = await fetch(
-        `/api/v1/ppt/presentation/update`,
+        `http://localhost:8000/api/v1/ppt/presentation/update`,
         {
           method: "PATCH",
           headers: getHeader(),
@@ -129,6 +129,9 @@ export class PresentationGenerationApi {
 
   static async presentationPrepare(presentationData: any) {
     try {
+      console.log("Starting presentationPrepare API call with data:", presentationData);
+      console.log("API URL: /api/v1/ppt/presentation/prepare");
+
       const response = await fetch(
         `/api/v1/ppt/presentation/prepare`,
         {
@@ -138,10 +141,13 @@ export class PresentationGenerationApi {
           cache: "no-cache",
         }
       );
-      
+
+      console.log("API response received:", response.status, response.statusText);
+
       return await ApiResponseHandler.handleResponse(response, "Failed to prepare presentation");
     } catch (error) {
       console.error("error in data generation", error);
+      console.error("Error details:", error.message, error.stack);
       throw error;
     }
   }

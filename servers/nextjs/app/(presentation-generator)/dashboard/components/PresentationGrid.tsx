@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { PresentationCard } from "./PresentationCard";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";

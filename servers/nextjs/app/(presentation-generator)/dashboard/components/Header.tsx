@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import HeaderNav from "@/app/(presentation-generator)/components/HeaderNab";
 import { Layout, FilePlus2 } from "lucide-react";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations, useLocale } from '@/lib/temporary-translations';
 const Header = () => {
   const pathname = usePathname();
   const router = useRouter();

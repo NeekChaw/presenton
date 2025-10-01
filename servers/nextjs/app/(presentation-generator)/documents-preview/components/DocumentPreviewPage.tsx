@@ -29,7 +29,7 @@ import { ChevronRight, PanelRightOpen, X } from "lucide-react";
 import ToolTip from "@/components/ToolTip";
 import Header from "@/app/(presentation-generator)/dashboard/components/Header";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 
 // Types
 interface LoadingState {

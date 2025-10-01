@@ -4,7 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 import { HelpCircle, X, Search } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 
@@ -187,9 +187,7 @@ const Help = () => {
 
           {/* Footer */}
           <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-            {t.rich('footer', {
-              link: (chunks) => <a href="/contact" className="text-emerald-600 hover:underline">{chunks}</a>
-            })}
+            {t('footer')}
           </div>
         </div>
       </div>

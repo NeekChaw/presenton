@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "@/lib/temporary-translations";
 
 import Wrapper from "@/components/Wrapper";
 import { DashboardApi } from "@/app/(presentation-generator)/services/api/dashboard";
